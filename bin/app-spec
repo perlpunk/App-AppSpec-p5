@@ -29,7 +29,7 @@ commands:
         -   name: all
             type: bool
     completion:
-        summary: Generate completion for a specified apec file
+        summary: Generate completion for a specified spec file
         options:
         -   name: name
             description: name of the program

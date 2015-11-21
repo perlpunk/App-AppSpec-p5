@@ -16,7 +16,7 @@ _app-spec() {
 
         case $state in
         cmd1)
-            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified apec file" help\:"Show command help"))'
+            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help"))'
         ;;
         args)
             case $line[1] in
