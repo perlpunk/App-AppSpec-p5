@@ -21,7 +21,7 @@ name: app-spec
 version: 1
 title: Utility for reading specification for cli apps
 options:
-commands:
+subcommands:
     help:
         op: cmd_help
         summary: Show command help

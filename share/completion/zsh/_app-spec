@@ -6,12 +6,12 @@ _app-spec() {
     local curcontext="$curcontext" state line context
 
 
-            # ---- Command: 
+        # ---- Command: 
         _arguments -s  \
             '1: :->cmd1' \
             '*: :->args' \
-                '(--help -h)'{--help,-h}'[Show command help]' \
-        && ret=0
+            '(--help -h)'{--help,-h}'[Show command help]' \
+            && ret=0
 
 
         case $state in
@@ -20,226 +20,310 @@ _app-spec() {
         ;;
         args)
             case $line[1] in
-                _complete)
+            _complete)
 
                 # ---- Command: _complete
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->cmd2' \
                     '*: :->args' \
-                        '--name[name of the program]:name' \
-                && ret=0
+                    '--name[name of the program]:name' \
+                    && ret=0
 
 
-            case $state in
-            cmd2)
-                _alternative 'args:cmd3:((bash\:"for bash" zsh\:"for zsh"))'
-            ;;
-            args)
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((bash\:"for bash" zsh\:"for zsh"))'
+                ;;
+                args)
                     case $line[2] in
                     bash)
 
-                    # ---- Command: _complete bash
+                        # ---- Command: _complete bash
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
                             '*: :->args' \
-                                '--without-description[generate without description]' \
-                        && ret=0
+                            '--without-description[generate without description]' \
+                            && ret=0
 
 
-                ;;
+                        case $state in
+                        args)
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
+                    ;;
                     zsh)
 
-                    # ---- Command: _complete zsh
+                        # ---- Command: _complete zsh
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
                             '*: :->args' \
-                        && ret=0
+                            && ret=0
 
+
+                        case $state in
+                        args)
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
+                    ;;
+                    esac
 
                 ;;
-            esac
+                *)
 
+                ;;
+                esac
             ;;
-            esac
-            ;;
-                completion)
+            completion)
 
                 # ---- Command: completion
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->cmd2' \
                     '*: :->args' \
-                        '--name[name of the program]:name' \
-                && ret=0
+                    '--name[name of the program]:name' \
+                    && ret=0
 
 
-            case $state in
-            cmd2)
-                _alternative 'args:cmd3:((bash\:"for bash" zsh\:"for zsh"))'
-            ;;
-            args)
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((bash\:"for bash" zsh\:"for zsh"))'
+                ;;
+                args)
                     case $line[2] in
                     bash)
 
-                    # ---- Command: completion bash
+                        # ---- Command: completion bash
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                '3: :->spec_file' \
+                            '3: :->spec_file' \
                             '*: :->args' \
-                                '--without-description[generate without description]' \
-                        && ret=0
+                            '--without-description[generate without description]' \
+                            && ret=0
 
-                case $state in
+                        case $state in
                         spec_file)
 _files
                         ;;
-                esac
+                        esac
 
-                ;;
+                        case $state in
+                        args)
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
+                    ;;
                     zsh)
 
-                    # ---- Command: completion zsh
+                        # ---- Command: completion zsh
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                '3: :->spec_file' \
+                            '3: :->spec_file' \
                             '*: :->args' \
-                        && ret=0
+                            && ret=0
 
-                case $state in
+                        case $state in
                         spec_file)
 _files
                         ;;
-                esac
+                        esac
+
+                        case $state in
+                        args)
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
+                    ;;
+                    esac
 
                 ;;
-            esac
+                *)
 
+                ;;
+                esac
             ;;
-            esac
-            ;;
-                help)
+            help)
 
                 # ---- Command: help
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->cmd2' \
                     '*: :->args' \
-                        '--all[]' \
-                && ret=0
+                    '--all[]' \
+                    && ret=0
 
 
-            case $state in
-            cmd2)
-                _alternative 'args:cmd3:((_complete completion))'
-            ;;
-            args)
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((_complete completion))'
+                ;;
+                args)
                     case $line[2] in
                     _complete)
 
-                    # ---- Command: help _complete
+                        # ---- Command: help _complete
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
                             '3: :->cmd3' \
                             '*: :->args' \
-                        && ret=0
+                            && ret=0
 
 
-                case $state in
-                cmd3)
-                    _alternative 'args:cmd4:((bash zsh))'
-                ;;
-                args)
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((bash zsh))'
+                        ;;
+                        args)
                             case $line[3] in
-                        bash)
+                            bash)
 
-                        # ---- Command: help _complete bash
+                                # ---- Command: help _complete bash
                                 _arguments -s -C \
                                     '1: :->cmd1' \
                                     '2: :->cmd2' \
                                     '3: :->cmd3' \
                                     '*: :->args' \
-                                && ret=0
+                                    && ret=0
 
 
-                    ;;
-                        zsh)
+                                case $state in
+                                args)
 
-                        # ---- Command: help _complete zsh
+                                ;;
+                                *)
+
+                                ;;
+                                esac
+                            ;;
+                            zsh)
+
+                                # ---- Command: help _complete zsh
                                 _arguments -s -C \
                                     '1: :->cmd1' \
                                     '2: :->cmd2' \
                                     '3: :->cmd3' \
                                     '*: :->args' \
-                                && ret=0
+                                    && ret=0
 
 
+                                case $state in
+                                args)
+
+                                ;;
+                                *)
+
+                                ;;
+                                esac
+                            ;;
+                            esac
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
                     ;;
-                esac
-
-                ;;
-                esac
-                ;;
                     completion)
 
-                    # ---- Command: help completion
+                        # ---- Command: help completion
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
                             '3: :->cmd3' \
                             '*: :->args' \
-                        && ret=0
+                            && ret=0
 
 
-                case $state in
-                cmd3)
-                    _alternative 'args:cmd4:((bash zsh))'
-                ;;
-                args)
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((bash zsh))'
+                        ;;
+                        args)
                             case $line[3] in
-                        bash)
+                            bash)
 
-                        # ---- Command: help completion bash
+                                # ---- Command: help completion bash
                                 _arguments -s -C \
                                     '1: :->cmd1' \
                                     '2: :->cmd2' \
                                     '3: :->cmd3' \
                                     '*: :->args' \
-                                && ret=0
+                                    && ret=0
 
 
-                    ;;
-                        zsh)
+                                case $state in
+                                args)
 
-                        # ---- Command: help completion zsh
+                                ;;
+                                *)
+
+                                ;;
+                                esac
+                            ;;
+                            zsh)
+
+                                # ---- Command: help completion zsh
                                 _arguments -s -C \
                                     '1: :->cmd1' \
                                     '2: :->cmd2' \
                                     '3: :->cmd3' \
                                     '*: :->args' \
-                                && ret=0
+                                    && ret=0
 
 
+                                case $state in
+                                args)
+
+                                ;;
+                                *)
+
+                                ;;
+                                esac
+                            ;;
+                            esac
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
                     ;;
-                esac
+                    esac
+
+                ;;
+                *)
 
                 ;;
                 esac
-                ;;
+            ;;
             esac
 
-            ;;
-            esac
-            ;;
-        esac
+        ;;
+        *)
 
         ;;
         esac
 
 }
+
+
 

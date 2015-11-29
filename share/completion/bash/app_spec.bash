@@ -5,6 +5,7 @@
 _app-spec() {
 
     COMPREPLY=()
+    local program=app-spec
     local cur=${COMP_WORDS[$COMP_CWORD]}
 #    echo "COMP_CWORD:$COMP_CWORD cur:$cur" >>/tmp/comp
 
@@ -151,6 +152,8 @@ _app-spec_compreply() {
         COMPREPLY=( ${COMPREPLY[0]%% -- *} ) #Remove ' -- ' and everything after
     fi
 }
+
+
 
 complete -o default -F _app-spec app-spec
 
