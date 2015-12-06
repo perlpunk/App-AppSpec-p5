@@ -16,7 +16,7 @@ _app-spec() {
 
         case $state in
         cmd1)
-            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help"))'
+            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod"))'
         ;;
         args)
             case $line[1] in
@@ -25,58 +25,15 @@ _app-spec() {
                 # ---- Command: _complete
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '2: :->cmd2' \
                     '*: :->args' \
                     '--name[name of the program]:name' \
+                    '--zsh[for zsh]' \
+                    '--bash[for bash]' \
                     && ret=0
 
 
                 case $state in
-                cmd2)
-                    _alternative 'args:cmd3:((bash\:"for bash" zsh\:"for zsh"))'
-                ;;
                 args)
-                    case $line[2] in
-                    bash)
-
-                        # ---- Command: _complete bash
-                        _arguments -s -C \
-                            '1: :->cmd1' \
-                            '2: :->cmd2' \
-                            '*: :->args' \
-                            '--without-description[generate without description]' \
-                            && ret=0
-
-
-                        case $state in
-                        args)
-
-                        ;;
-                        *)
-
-                        ;;
-                        esac
-                    ;;
-                    zsh)
-
-                        # ---- Command: _complete zsh
-                        _arguments -s -C \
-                            '1: :->cmd1' \
-                            '2: :->cmd2' \
-                            '*: :->args' \
-                            && ret=0
-
-
-                        case $state in
-                        args)
-
-                        ;;
-                        *)
-
-                        ;;
-                        esac
-                    ;;
-                    esac
 
                 ;;
                 *)
@@ -173,7 +130,7 @@ _files
 
                 case $state in
                 cmd2)
-                    _alternative 'args:cmd3:((_complete completion))'
+                    _alternative 'args:cmd3:((_complete completion pod))'
                 ;;
                 args)
                     case $line[2] in
@@ -183,58 +140,12 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '3: :->cmd3' \
                             '*: :->args' \
                             && ret=0
 
 
                         case $state in
-                        cmd3)
-                            _alternative 'args:cmd4:((bash zsh))'
-                        ;;
                         args)
-                            case $line[3] in
-                            bash)
-
-                                # ---- Command: help _complete bash
-                                _arguments -s -C \
-                                    '1: :->cmd1' \
-                                    '2: :->cmd2' \
-                                    '3: :->cmd3' \
-                                    '*: :->args' \
-                                    && ret=0
-
-
-                                case $state in
-                                args)
-
-                                ;;
-                                *)
-
-                                ;;
-                                esac
-                            ;;
-                            zsh)
-
-                                # ---- Command: help _complete zsh
-                                _arguments -s -C \
-                                    '1: :->cmd1' \
-                                    '2: :->cmd2' \
-                                    '3: :->cmd3' \
-                                    '*: :->args' \
-                                    && ret=0
-
-
-                                case $state in
-                                args)
-
-                                ;;
-                                *)
-
-                                ;;
-                                esac
-                            ;;
-                            esac
 
                         ;;
                         *)
@@ -307,7 +218,50 @@ _files
                         ;;
                         esac
                     ;;
+                    pod)
+
+                        # ---- Command: help pod
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        args)
+
+                        ;;
+                        *)
+
+                        ;;
+                        esac
+                    ;;
                     esac
+
+                ;;
+                *)
+
+                ;;
+                esac
+            ;;
+            pod)
+
+                # ---- Command: pod
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->spec_file' \
+                    '*: :->args' \
+                    && ret=0
+
+                case $state in
+                spec_file)
+_files
+                ;;
+                esac
+
+                case $state in
+                args)
 
                 ;;
                 *)

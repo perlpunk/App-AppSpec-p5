@@ -53,3 +53,9 @@ subcommands:
                     description: generate without description
                 parameters:
                 -   *param_spec_file
+    pod:
+        summary: Generate pod
+        options:
+        op: generate_pod
+        parameters:
+        -   *param_spec_file

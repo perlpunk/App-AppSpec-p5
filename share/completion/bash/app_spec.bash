@@ -12,7 +12,7 @@ _app-spec() {
     case $COMP_CWORD in
 
     1)
-        _app-spec_compreply "_complete -- Generate self completion"$'\n'"completion -- Generate completion for a specified spec file"$'\n'"help -- Show command help"
+        _app-spec_compreply '_complete -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help -- Show command help'$'\n''pod -- Generate pod'
 
     ;;
     *)
@@ -20,32 +20,19 @@ _app-spec() {
     case ${COMP_WORDS[1]} in
       _complete)
         case $COMP_CWORD in
-
-        2)
-            _app-spec_compreply "bash -- for bash"$'\n'"zsh -- for zsh"
-
-        ;;
         *)
-        # subcmds
-        case ${COMP_WORDS[2]} in
-          bash)
-            case $COMP_CWORD in
-            *)
-            case ${COMP_WORDS[$COMP_CWORD-1]} in
-              --without-description)
-              ;;
-
-              *)
-                _app-spec_compreply "'--without-description -- generate without description'"
-              ;;
-            esac
-            ;;
-            esac
+        case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --name)
           ;;
-          zsh)
+          --zsh)
+          ;;
+          --bash)
+          ;;
+
+          *)
+            _app-spec_compreply "'--name -- name of the program'"$'\n'"'--zsh -- for zsh'"$'\n'"'--bash -- for bash'"
           ;;
         esac
-
         ;;
         esac
       ;;
@@ -53,7 +40,7 @@ _app-spec() {
         case $COMP_CWORD in
 
         2)
-            _app-spec_compreply "bash -- for bash"$'\n'"zsh -- for zsh"
+            _app-spec_compreply 'bash -- for bash'$'\n''zsh -- for zsh'
 
         ;;
         *)
@@ -90,36 +77,19 @@ _app-spec() {
         case $COMP_CWORD in
 
         2)
-            _app-spec_compreply "_complete"$'\n'"completion"
+            _app-spec_compreply '_complete'$'\n''completion'$'\n''pod'
 
         ;;
         *)
         # subcmds
         case ${COMP_WORDS[2]} in
           _complete)
-            case $COMP_CWORD in
-
-            3)
-                _app-spec_compreply "bash"$'\n'"zsh"
-
-            ;;
-            *)
-            # subcmds
-            case ${COMP_WORDS[3]} in
-              bash)
-              ;;
-              zsh)
-              ;;
-            esac
-
-            ;;
-            esac
           ;;
           completion)
             case $COMP_CWORD in
 
             3)
-                _app-spec_compreply "bash"$'\n'"zsh"
+                _app-spec_compreply 'bash'$'\n''zsh'
 
             ;;
             *)
@@ -134,8 +104,16 @@ _app-spec() {
             ;;
             esac
           ;;
+          pod)
+          ;;
         esac
 
+        ;;
+        esac
+      ;;
+      pod)
+        case $COMP_CWORD in
+        2)
         ;;
         esac
       ;;

@@ -34,6 +34,16 @@ sub cmd_completion_zsh {
     say $completion;
 }
 
+sub generate_pod {
+    my ($self) = @_;
+    my $parameters = $self->parameters;
+
+    my $spec_file = $parameters->{spec_file};
+    my $spec = App::Spec->read($spec_file);
+    my $pod = $spec->generate_pod(
+    );
+    say $pod;
+}
 
 
 1;
