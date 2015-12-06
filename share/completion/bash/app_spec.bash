@@ -38,38 +38,21 @@ _app-spec() {
       ;;
       completion)
         case $COMP_CWORD in
-
         2)
-            _app-spec_compreply 'bash -- for bash'$'\n''zsh -- for zsh'
-
         ;;
         *)
-        # subcmds
-        case ${COMP_WORDS[2]} in
-          bash)
-            case $COMP_CWORD in
-            3)
-            ;;
-            *)
-            case ${COMP_WORDS[$COMP_CWORD-1]} in
-              --without-description)
-              ;;
-
-              *)
-                _app-spec_compreply "'--without-description -- generate without description'"
-              ;;
-            esac
-            ;;
-            esac
+        case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --name)
           ;;
-          zsh)
-            case $COMP_CWORD in
-            3)
-            ;;
-            esac
+          --zsh)
+          ;;
+          --bash)
+          ;;
+
+          *)
+            _app-spec_compreply "'--name -- name of the program'"$'\n'"'--zsh -- for zsh'"$'\n'"'--bash -- for bash'"
           ;;
         esac
-
         ;;
         esac
       ;;
@@ -86,23 +69,6 @@ _app-spec() {
           _complete)
           ;;
           completion)
-            case $COMP_CWORD in
-
-            3)
-                _app-spec_compreply 'bash'$'\n''zsh'
-
-            ;;
-            *)
-            # subcmds
-            case ${COMP_WORDS[3]} in
-              bash)
-              ;;
-              zsh)
-              ;;
-            esac
-
-            ;;
-            esac
           ;;
           pod)
           ;;

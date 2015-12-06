@@ -8,28 +8,18 @@ our $VERSION = '0.000'; # VERSION
 
 use base 'App::Spec::Run';
 
-sub cmd_completion_bash {
+sub cmd_completion {
     my ($self) = @_;
     my $options = $self->options;
     my $parameters = $self->parameters;
 
-    my $spec_file = $parameters->{spec_file};
-    my $spec = App::Spec->read($spec_file);
-    my $completion = $spec->generate_completion(
-        shell => "bash",
-    );
-    say $completion;
-}
-
-sub cmd_completion_zsh {
-    my ($self) = @_;
-#    my $options = $self->options;
-    my $parameters = $self->parameters;
+    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
+    die "Specify which shell" unless $shell;
 
     my $spec_file = $parameters->{spec_file};
     my $spec = App::Spec->read($spec_file);
     my $completion = $spec->generate_completion(
-        shell => "zsh",
+        shell => $shell,
     );
     say $completion;
 }

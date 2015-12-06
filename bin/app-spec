@@ -30,29 +30,22 @@ subcommands:
             type: bool
     completion:
         summary: Generate completion for a specified spec file
+        op: cmd_completion
         options:
         -   name: name
             description: name of the program
-        subcommands:
-            zsh:
-                op: cmd_completion_zsh
-                summary: for zsh
-                parameters:
-                -   &param_spec_file
-                    name: spec_file
-                    type: file
-                    required: true
-                    description: Path to the spec file
-            bash:
-                op: cmd_completion_bash
-                summary: for bash
-                options:
-                -   name: without-description
-                    type: bool
-                    default: false
-                    description: generate without description
-                parameters:
-                -   *param_spec_file
+        -   name: zsh
+            description: for zsh
+            type: bool
+        -   name: bash
+            description: for bash
+            type: bool
+        parameters:
+        -   &param_spec_file
+            name: spec_file
+            type: file
+            required: true
+            description: Path to the spec file
     pod:
         summary: Generate pod
         options:
