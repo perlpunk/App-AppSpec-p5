@@ -1,0 +1,46 @@
+---
+name: app-spec
+appspec: { version: 0.001 }
+version: 1
+title: Utility for reading specification for cli apps
+options:
+  - name: color
+    summary: output colorized
+    type: bool
+    aliases: [C]
+subcommands:
+  help:
+    op: cmd_help
+    summary: Show command help
+    options:
+    - name: all
+      type: bool
+  completion:
+    summary: Generate completion for a specified spec file
+    op: cmd_completion
+    options:
+    - name: name
+      description: name of the program
+    - name: zsh
+      description: for zsh
+      type: bool
+    - name: bash
+      description: for bash
+      type: bool
+    parameters:
+    - &param_spec_file
+      name: spec_file
+      type: file
+      required: true
+      description: Path to the spec file
+  pod:
+    summary: Generate pod
+    op: generate_pod
+    parameters:
+    - *param_spec_file
+  validate:
+    summary: Validate spec file
+    op: validate
+    parameters:
+    - *param_spec_file
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

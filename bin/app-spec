@@ -4,51 +4,15 @@ use strict;
 use warnings;
 use 5.010;
 use Data::Dumper;
-use FindBin '$Bin';
 
 use App::Spec;
 use App::AppSpec;
+use File::Share qw/ dist_file /;
 
-my $spec = App::Spec->read(\*DATA);
+my $specfile = dist_file("App-AppSpec", "appspec-spec.yaml");
+my $spec = App::Spec->read($specfile);
 my $run = App::AppSpec->new({
     spec => $spec,
 });
 $run->run;
 
-__DATA__
----
-name: app-spec
-version: 1
-title: Utility for reading specification for cli apps
-options:
-subcommands:
-    help:
-        op: cmd_help
-        summary: Show command help
-        options:
-        -   name: all
-            type: bool
-    completion:
-        summary: Generate completion for a specified spec file
-        op: cmd_completion
-        options:
-        -   name: name
-            description: name of the program
-        -   name: zsh
-            description: for zsh
-            type: bool
-        -   name: bash
-            description: for bash
-            type: bool
-        parameters:
-        -   &param_spec_file
-            name: spec_file
-            type: file
-            required: true
-            description: Path to the spec file
-    pod:
-        summary: Generate pod
-        options:
-        op: generate_pod
-        parameters:
-        -   *param_spec_file

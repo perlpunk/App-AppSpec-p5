@@ -10,14 +10,14 @@ _app-spec() {
         _arguments -s  \
             '1: :->cmd1' \
             '*: :->args' \
-            '(--help -h)'{--help,-h}'[Show command help]' \
             && ret=0
 
 
         case $state in
         cmd1)
-            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod"))'
+            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod" validate\:"Validate spec file"))'
         ;;
+
         args)
             case $line[1] in
             _complete)
@@ -25,21 +25,16 @@ _app-spec() {
                 # ---- Command: _complete
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '*: :->args' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
                     '--name[name of the program]:name' \
                     '--zsh[for zsh]' \
                     '--bash[for bash]' \
                     && ret=0
 
 
-                case $state in
-                args)
-
-                ;;
-                *)
-
-                ;;
-                esac
             ;;
             completion)
 
@@ -47,7 +42,10 @@ _app-spec() {
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->spec_file' \
-                    '*: :->args' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
                     '--name[name of the program]:name' \
                     '--zsh[for zsh]' \
                     '--bash[for bash]' \
@@ -59,14 +57,6 @@ _files
                 ;;
                 esac
 
-                case $state in
-                args)
-
-                ;;
-                *)
-
-                ;;
-                esac
             ;;
             help)
 
@@ -75,14 +65,14 @@ _files
                     '1: :->cmd1' \
                     '2: :->cmd2' \
                     '*: :->args' \
-                    '--all[]' \
                     && ret=0
 
 
                 case $state in
                 cmd2)
-                    _alternative 'args:cmd3:((_complete completion pod))'
+                    _alternative 'args:cmd3:((_complete completion pod validate))'
                 ;;
+
                 args)
                     case $line[2] in
                     _complete)
@@ -91,18 +81,14 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '*: :->args' \
+                            '--color[output colorized]' \
+                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
                             && ret=0
 
 
-                        case $state in
-                        args)
-
-                        ;;
-                        *)
-
-                        ;;
-                        esac
                     ;;
                     completion)
 
@@ -110,18 +96,14 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '*: :->args' \
+                            '--color[output colorized]' \
+                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
                             && ret=0
 
 
-                        case $state in
-                        args)
-
-                        ;;
-                        *)
-
-                        ;;
-                        esac
                     ;;
                     pod)
 
@@ -129,25 +111,34 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '*: :->args' \
+                            '--color[output colorized]' \
+                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
                             && ret=0
 
 
-                        case $state in
-                        args)
+                    ;;
+                    validate)
 
-                        ;;
-                        *)
+                        # ---- Command: help validate
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--color[output colorized]' \
+                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
 
-                        ;;
-                        esac
+
                     ;;
                     esac
 
                 ;;
-                *)
 
-                ;;
                 esac
             ;;
             pod)
@@ -156,7 +147,10 @@ _files
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->spec_file' \
-                    '*: :->args' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
                     && ret=0
 
                 case $state in
@@ -165,21 +159,30 @@ _files
                 ;;
                 esac
 
+            ;;
+            validate)
+
+                # ---- Command: validate
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->spec_file' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    && ret=0
+
                 case $state in
-                args)
-
-                ;;
-                *)
-
+                spec_file)
+_files
                 ;;
                 esac
+
             ;;
             esac
 
         ;;
-        *)
 
-        ;;
         esac
 
 }

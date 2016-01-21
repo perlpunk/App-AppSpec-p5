@@ -1,8 +1,11 @@
 # ABSTRACT: Module for app-spec tool
 use strict;
 use warnings;
-package App::AppSpec;
 use 5.010;
+use utf8;
+package App::AppSpec;
+use App::AppSpec::Schema::Validator;
+use Term::ANSIColor;
 
 our $VERSION = '0.000'; # VERSION
 
@@ -35,5 +38,34 @@ sub generate_pod {
     say $pod;
 }
 
+sub colorize {
+    my ($self) = @_;
+    my $color = $self->options->{color};
+    my $env_color = $ENV{PERL5_APPSPEC_COLOR_OUTPUT} // 1;
+    return unless -t STDOUT;
+    return ($color || $env_color);
+}
+
+sub validate {
+    my ($self) = @_;
+    my $parameters = $self->parameters;
+    my $color = $self->colorize;
+
+    my $specfile = $parameters->{spec_file};
+    my $validator = App::AppSpec::Schema::Validator->new;
+    my @errors = $validator->validate_spec_file($specfile);
+    binmode STDOUT, ":encoding(utf-8)";
+    if (@errors) {
+        print $validator->format_errors(\@errors);
+        $color and print color 'red';
+        say "Not valid!";
+        $color and print color 'reset';
+    }
+    else {
+        $color and print color 'bold green';
+        say "Validated ✓";
+        $color and print color 'reset';
+    }
+}
 
 1;

@@ -12,7 +12,7 @@ _app-spec() {
     case $COMP_CWORD in
 
     1)
-        _app-spec_compreply '_complete -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help -- Show command help'$'\n''pod -- Generate pod'
+        _app-spec_compreply '_complete -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help -- Show command help'$'\n''pod -- Generate pod'$'\n''validate -- Validate spec file'
 
     ;;
     *)
@@ -60,7 +60,7 @@ _app-spec() {
         case $COMP_CWORD in
 
         2)
-            _app-spec_compreply '_complete'$'\n''completion'$'\n''pod'
+            _app-spec_compreply '_complete'$'\n''completion'$'\n''pod'$'\n''validate'
 
         ;;
         *)
@@ -72,12 +72,20 @@ _app-spec() {
           ;;
           pod)
           ;;
+          validate)
+          ;;
         esac
 
         ;;
         esac
       ;;
       pod)
+        case $COMP_CWORD in
+        2)
+        ;;
+        esac
+      ;;
+      validate)
         case $COMP_CWORD in
         2)
         ;;
