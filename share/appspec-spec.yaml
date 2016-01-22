@@ -9,12 +9,6 @@ options:
     type: bool
     aliases: [C]
 subcommands:
-  help:
-    op: cmd_help
-    summary: Show command help
-    options:
-    - name: all
-      type: bool
   completion:
     summary: Generate completion for a specified spec file
     op: cmd_completion
