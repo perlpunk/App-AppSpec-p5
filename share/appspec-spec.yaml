@@ -1,5 +1,5 @@
 ---
-name: app-spec
+name: appspec
 appspec: { version: 0.001 }
 version: 1
 title: Utility for reading specification for cli apps

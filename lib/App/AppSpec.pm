@@ -1,4 +1,4 @@
-# ABSTRACT: Module for app-spec tool
+# ABSTRACT: App Module ad utilities for appspec tool
 use strict;
 use warnings;
 use 5.010;

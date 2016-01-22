@@ -1,7 +1,7 @@
-#compdef app-spec
+#compdef appspec
 
-_app-spec() {
-    local program=app-spec
+_appspec() {
+    local program=appspec
     typeset -A opt_args
     local curcontext="$curcontext" state line context
 
