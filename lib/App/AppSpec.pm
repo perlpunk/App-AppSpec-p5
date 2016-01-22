@@ -4,7 +4,6 @@ use warnings;
 use 5.010;
 use utf8;
 package App::AppSpec;
-use App::AppSpec::Schema::Validator;
 use Term::ANSIColor;
 
 our $VERSION = '0.000'; # VERSION
@@ -52,6 +51,7 @@ sub validate {
     my $color = $self->colorize;
 
     my $specfile = $parameters->{spec_file};
+    require App::AppSpec::Schema::Validator;
     my $validator = App::AppSpec::Schema::Validator->new;
     my @errors = $validator->validate_spec_file($specfile);
     binmode STDOUT, ":encoding(utf-8)";
