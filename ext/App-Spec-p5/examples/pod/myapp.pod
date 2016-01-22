@@ -1,0 +1,101 @@
+=head1 NAME
+
+myapp - My Very Cool App
+
+=head1 ABSTRACT
+
+This app can do very cool things
+
+=head1 DESCRIPTION
+
+This is a very useful description for myapp.
+This is a very useful description for myapp.
+This is a very useful description for myapp.
+This is a very useful description for myapp.
+
+
+=head2 GLOBAL OPTIONS
+
+    --verbose -v    be verbose       
+    --help -h       Show command help
+
+
+=head2 SUBCOMMANDS
+
+=head3  cook
+
+    myapp  cook [options] <drink>
+
+Cook something
+
+Options:
+
+    --with        Drink with ...
+    --sugar -s    add sugar     
+
+Parameters:
+
+    drink  *  
+
+=head3  weather
+
+    myapp  weather <subcommands>
+
+Weather
+
+
+=head3 weather cities
+
+    myapp weather cities [options]
+
+show list of cities
+
+Options:
+
+    --country -c   [] country name(s)
+
+
+=head3 weather countries
+
+    myapp weather countries
+
+show list of countries
+
+
+=head3 weather show
+
+    myapp weather show <country> <city>+
+
+Show Weather forecast
+
+Parameters:
+
+    country  *    Specify country       
+    city     * [] Specify city or cities
+
+=head3  help
+
+    myapp  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all    
+
+
+=head3  _complete
+
+    myapp  _complete [options]
+
+Generate self completion
+
+Options:
+
+    --name    name of the program
+    --zsh     for zsh            
+    --bash    for bash           
+
+
+
+

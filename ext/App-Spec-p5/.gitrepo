@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:perlpunk/App-Spec-p5
+	branch = master
+	commit = 59208e6e258213e96f6e7d8357abf500bfdc5167
+	parent = 21c177c09f4188e09d576869efb99b7f5f4a7046
+	cmdver = 0.3.0
