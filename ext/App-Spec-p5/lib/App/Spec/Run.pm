@@ -19,6 +19,7 @@ sub run {
     my ($self) = @_;
     my $spec = $self->spec;
 
+    my $completion_parameter = $ENV{PERL5_APPSPECRUN_COMPLETION_PARAMETER};
     $self->check_help;
 
     my %option_specs;
@@ -33,11 +34,19 @@ sub run {
         parameter_list => \@param_list,
         param_specs => \%param_specs,
     );
+
+    my %options_config;
+    if ($completion_parameter) {
+        $options_config{required} = "ignore";
+        $options_config{default} = "ignore";
+    }
+
     my $opt = App::Spec::Options->new({
         options => $self->options,
         option_specs => \%option_specs,
         parameters => $self->parameters,
         param_specs => \%param_specs,
+        config => \%options_config,
     });
     my %errs;
     my ($ok) = $opt->process( \%errs, type => "parameters", app => $self );
@@ -45,12 +54,59 @@ sub run {
 
     unless ($ok) {
         my $err = Data::Dumper->Dump([\%errs], ['errs']);
-        my $help = $spec->usage($self->commands);
-        warn $help;
+        my $help = $spec->usage(
+            commands => $self->commands,
+            highlights => \%errs,
+            color => $self->colorize,
+        );
+        print STDERR $help;
         die "$err\nsorry =(\n";
     }
-    $self->$op;
+    my $args = {};
+    if ($completion_parameter) {
+        my $shell = $ENV{PERL5_APPSPECRUN_SHELL} or return;
+        my $param = $param_specs{ $completion_parameter };
+        my $completion = $param->completion;
+        my $op = $completion->{op} or return;
+        $args->{completion} = {
+            parameter => $completion_parameter,
+        };
+        my $result = $self->$op($args);
+        my $mod;
+        if ($shell eq 'bash') {
+            $mod = 'App::Spec::Completion::Bash';
+        }
+        elsif ($shell eq 'zsh') {
+            $mod = 'App::Spec::Completion::Zsh';
+        }
+        else {
+            return;
+        }
+        eval "use $mod";
+        my $string = $mod->list_to_alternative(
+            name => $completion_parameter,
+            list => $result,
+        );
+        say $string;
+    }
+    else {
+        $self->$op;
+    }
 
+}
+
+sub colorize {
+    my ($self) = @_;
+    if (($ENV{PERL5_APPSPECRUN_COLOR} // '') eq 'always') {
+        return 1;
+    }
+    if (($ENV{PERL5_APPSPECRUN_COLOR} // '') eq 'never') {
+        return 0;
+    }
+    if (-t STDOUT and -d STDERR) {
+        return 1;
+    }
+    return 0;
 }
 
 sub process_parameters {
@@ -95,16 +151,28 @@ sub process_commands_options {
     while (keys %$commands) {
         my @k = keys %$commands;
         my $cmd = shift @ARGV;
-        if (not defined $cmd and not $op) {
-            warn $spec->usage(\@cmds);
-            die "Missing subcommand(s)";
-        }
-        elsif (not defined $cmd) {
+        if (not defined $cmd) {
+            if (not $op or $subcommand_required) {
+                warn $spec->usage(
+                    commands => \@cmds,
+                    color => $self->colorize,
+                    highlights => {
+                        subcommands => 1,
+                    },
+                );
+                die $self->error("Missing subcommand(s)");
+            }
             last;
         }
         $cmd_spec = $commands->{ $cmd } or do {
-            warn $spec->usage(\@cmds);
-            die "Unknown subcommand '$cmd'";
+            warn $spec->usage(
+                commands => \@cmds,
+                color => $self->colorize,
+                highlights => {
+                    subcommands => 1,
+                },
+            );
+            die $self->error("Unknown subcommand '$cmd'");
         };
         $subcommand_required = $cmd_spec->{subcommand_required} // 1;
         my $cmd_options = $cmd_spec->options;
@@ -116,19 +184,25 @@ sub process_commands_options {
         @$param_list = @{ $cmd_spec->parameters };
     }
     my @names = sort keys %$commands;
-    if (@names and $subcommand_required) {
-        warn "Missing subcommand\n";
-        my $help = $spec->usage(\@cmds);
-        die $help;
-    }
     unless ($op) {
         warn "Missing op for commands (@cmds)\n";
-        my $help = $spec->usage(\@cmds);
+        my $help = $spec->usage(
+            commands => \@cmds,
+            color => $self->colorize,
+        );
         die $help;
     }
     $self->commands(\@cmds);
     $self->options(\%options);
     return $op;
+}
+
+sub error {
+    my ($self, $msg) = @_;
+    require Term::ANSIColor;
+    $self->colorize
+        and $msg = Term::ANSIColor::colored([qw/ bold red /], $msg);
+    return "$msg\n";
 }
 
 sub check_help {
@@ -149,7 +223,10 @@ sub cmd_help {
     my $spec = $self->spec;
     my $cmds = $self->commands;
     shift @$cmds;
-    my $help = $spec->usage($cmds);
+    my $help = $spec->usage(
+        commands => $cmds,
+        color => $self->colorize,
+    );
     say $help;
 }
 

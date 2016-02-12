@@ -35,8 +35,9 @@ $completion_outer
 
 _${name}_compreply() \{
     IFS=\$'\\n' COMPREPLY=(\$(compgen -W "\$1" -- \$\{COMP_WORDS\[COMP_CWORD\]\}))
-    if [[ \$\{#COMPREPLY[*]\} -eq 1 ]]; then #Only one completion
-        COMPREPLY=( \$\{COMPREPLY[0]%% -- *\} ) #Remove ' -- ' and everything after
+    if [[ \$\{#COMPREPLY[*]\} -eq 1 ]]; then # Only one completion
+        COMPREPLY=( \$\{COMPREPLY[0]%% -- *\} ) # Remove ' -- ' and everything after
+        COMPREPLY="\$(echo -e "\$COMPREPLY" | sed -e 's/[[:space:]]*\$//')"
     fi
 \}
 
@@ -54,12 +55,21 @@ sub completion_commands {
     my $functions = $args{functions};
     my $previous = $args{previous} || [];
     my $commands = $args{commands};
+    my $options = $args{options};
     my $level = $args{level};
     my $indent = "    " x $level;
 
+    my $maxlength = 0;
+    for (keys %$commands) {
+        if (length($_) > $maxlength) {
+            $maxlength = length $_;
+        }
+    }
     my @commands = map {
         my $summary = $commands->{ $_ }->summary;
-        length $summary ? "$_ -- " . $summary : $_
+        my $name = $_;
+        $name .= ' ' x ($maxlength - length);
+        length $summary ? "$name -- " . $summary : $name
     } sort keys %$commands;
     for (@commands) {
         s/['`]/'"'"'/g;
@@ -78,21 +88,21 @@ EOM
         my $spec = $commands->{ $name };
         my $subcommands = $spec->subcommands;
         my $parameters = $spec->parameters;
-        my $options = $spec->options;
+        my $cmd_options = $spec->options;
         if (keys %$subcommands) {
             my $comp = $self->completion_commands(
                 commands => $subcommands,
-                options => $spec->options,
+                options => [ @$options, @$cmd_options ],
                 level => $level + 1,
                 previous => [@$previous, $name],
                 functions => $functions,
             );
             $subc .= $comp;
         }
-        elsif (@$parameters or @$options) {
+        elsif (@$parameters or @$cmd_options) {
             $subc .= $self->completion_parameters(
                 parameters => $parameters,
-                options => $options,
+                options => [ @$options, @$cmd_options ],
                 level => $level + 1,
                 previous => [@$previous, $name],
                 functions => $functions,
@@ -157,23 +167,36 @@ EOM
         my $comp_value = <<"EOM";
 ${indent}case \$\{COMP_WORDS[\$COMP_CWORD-1]\} in
 EOM
+        my $maxlength = 0;
+        for my $opt (@$options) {
+            my $name = $opt->name;
+            my $aliases = $opt->aliases;
+            my @names = ($name, @$aliases);
+            for my $n (@names) {
+                my $length = length $n;
+                $length = $length > 1 ? $length+2 : $length+1;
+                $maxlength = $length if $length > $maxlength;
+            }
+        }
         for my $i (0 .. $#$options) {
             my $opt = $options->[ $i ];
             my $name = $opt->name;
             my $type = $opt->type;
             my $summary = $opt->description;
+            $summary =~ s/['`]/'"'"'/g;
+            $summary =~ s/\$/\\\$/g;
             my $aliases = $opt->aliases;
             my @names = ($name, @$aliases);
             my @option_strings;
             for my $n (@names) {
                 my $dash = length $n > 1 ? "--" : "-";
                 my $option_string = "$dash$n";
-                $summary =~ s/['`]/'"'"'/g;
-                $summary =~ s/\$/\\\$/g;
+                push @option_strings, $option_string;
+                my $length = length $option_string;
+                $option_string .= " " x ($maxlength - $length);
                 my $string = length $summary
                     ? qq{'$option_string -- $summary'}
                     : qq{'$option_string'};
-                push @option_strings, $option_string;
                 push @comp_options, $string;
             }
 
@@ -182,11 +205,12 @@ ${indent}  @{[ join '|', @option_strings ]})
 EOM
             if (ref $type) {
                 if (my $list = $type->{enum}) {
-                    my @list = map { s/ /\\ /g; "'$_'" } @$list;
+                    my @list = map { s/ /\\ /g; $_ } @$list;
                     local $" = q{"$'\\n'"};
                     for (@list) {
                         s/['`]/'"'"'/g;
                         s/\$/\\\$/g;
+                        $_ = "'$_'";
                     }
                     $comp_value .= <<"EOM";
 ${indent}    _${appname}_compreply "@list"
@@ -237,47 +261,95 @@ sub dynamic_completion {
     my $name = $p->name;
     my $def = $p->completion;
     my $command = $def->{command};
+    my $op = $def->{op};
     my @args;
-    for my $arg (@$command) {
-        unless (ref $arg) {
-            push @args, "'$arg'";
-            next;
-        }
-        if (my $replace = $arg->{replace}) {
-            if (ref $replace eq 'ARRAY') {
-                my @repl = @$replace;
-                if ($replace->[0] eq 'SHELL_WORDS') {
-                    my $num = $replace->[1];
-                    my $index = "\$COMP_CWORD";
-                    if ($num ne 'CURRENT') {
-                        $index .= $num;
-                    }
-                    my $string = qq{"\$\{COMP_WORDS\[$index\]\}"};
-                    push @args, $string;
-                }
-            }
-            else {
-                if ($replace eq "SELF") {
-                    push @args, "\$program";
-                }
-            }
-        }
-    }
-    my $varname = "__${name}_completion";
-
     my $appname = $self->spec->name;
     my $function_name = "_${appname}_"
         . join ("_", @$previous)
         . "_" . ($p->isa("App::Spec::Option") ? "option" : "param")
         . "_" . $name . "_completion";
-    my $function = <<"EOM";
+
+    my $function;
+    if ($op) {
+        $function = <<"EOM";
+$function_name() \{
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=bash PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' \${COMP_WORDS[@]}`
+    _myapp_compreply "\$__dynamic_completion"
+\}
+EOM
+    }
+    elsif ($command) {
+        for my $arg (@$command) {
+            unless (ref $arg) {
+                push @args, "'$arg'";
+                next;
+            }
+            if (my $replace = $arg->{replace}) {
+                if (ref $replace eq 'ARRAY') {
+                    my @repl = @$replace;
+                    if ($replace->[0] eq 'SHELL_WORDS') {
+                        my $num = $replace->[1];
+                        my $index = "\$COMP_CWORD";
+                        if ($num ne 'CURRENT') {
+                            if ($num =~ m/^-/) {
+                                $index .= $num;
+                            }
+                            else {
+                                $index = $num - 1;
+                            }
+                        }
+                        my $string = qq{"\$\{COMP_WORDS\[$index\]\}"};
+                        push @args, $string;
+                    }
+                }
+                else {
+                    if ($replace eq "SELF") {
+                        push @args, "\$program";
+                    }
+                }
+            }
+        }
+        my $varname = "__${name}_completion";
+
+        $function = <<"EOM";
 $function_name() \{
     local param_$name=`@args`
     _${appname}_compreply "\$param_$name"
 \}
 EOM
+    }
     push @$functions, $function;
     return $function_name;
+}
+
+sub list_to_alternative {
+    my ($self, %args) = @_;
+    my $list = $args{list};
+    my $maxlength = 0;
+    for (@$list) {
+        if (length($_) > $maxlength) {
+            $maxlength = length $_;
+        }
+    }
+    my @alt = map {
+        my ($alt_name, $summary);
+        if (ref $_ eq 'ARRAY') {
+            ($alt_name, $summary) = @$_;
+        }
+        else {
+            ($alt_name, $summary) = ($_, '');
+        }
+        $summary //= '';
+        $alt_name =~ s/:/\\\\:/g;
+        $summary =~ s/['`]/'"'"'/g;
+        $summary =~ s/\$/\\\$/g;
+        if (length $summary) {
+            $alt_name .= " " x ($maxlength - length($alt_name));
+        }
+        $alt_name;
+    } @$list;
+    return join '', map { "$_\n" } @alt;
 }
 
 sub completion_parameter {

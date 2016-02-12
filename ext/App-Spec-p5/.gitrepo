@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:perlpunk/App-Spec-p5
 	branch = master
-	commit = 59208e6e258213e96f6e7d8357abf500bfdc5167
-	parent = 21c177c09f4188e09d576869efb99b7f5f4a7046
+	commit = fbdefc3bd29414a027ce4a803742845cfb8ecd39
+	parent = a06d5a987a99626c15d4625b905b554177160cfd
 	cmdver = 0.3.0
