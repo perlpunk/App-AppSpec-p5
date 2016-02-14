@@ -65,7 +65,8 @@ sub validate {
     my $validator = App::AppSpec::Schema::Validator->new;
     my $spec_file = $parameters->{spec_file};
     if (ref $spec_file eq 'SCALAR') {
-        @errors = $validator->validate_spec($$spec_file);
+        my $spec = YAML::XS::Load($$spec_file);
+        @errors = $validator->validate_spec($spec);
     }
     else {
         @errors = $validator->validate_spec_file($spec_file);
