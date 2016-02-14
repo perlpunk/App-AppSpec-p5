@@ -63,12 +63,11 @@ sub validate {
     my @errors;
     require App::AppSpec::Schema::Validator;
     my $validator = App::AppSpec::Schema::Validator->new;
-    if ($options->{stdin}) {
-        my $text = do { local $/; <STDIN> };
-        @errors = $validator->validate_spec($text);
+    my $spec_file = $parameters->{spec_file};
+    if (ref $spec_file eq 'SCALAR') {
+        @errors = $validator->validate_spec($$spec_file);
     }
     else {
-        my $spec_file = $options->{spec};
         @errors = $validator->validate_spec_file($spec_file);
     }
     binmode STDOUT, ":encoding(utf-8)";
