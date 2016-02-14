@@ -41,21 +41,17 @@ _appspec() {
                 # ---- Command: completion
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '2: :->spec_file' \
                     '--color[output colorized]' \
                     '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
+                    '--spec[Path to the spec file]:spec:_files' \
+                    '--stdin[Spec as STDIN]' \
                     '--name[name of the program]:name' \
                     '--zsh[for zsh]' \
                     '--bash[for bash]' \
                     && ret=0
 
-                case $state in
-                spec_file)
-_files
-                ;;
-                esac
 
             ;;
             help)
@@ -146,18 +142,14 @@ _files
                 # ---- Command: pod
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '2: :->spec_file' \
                     '--color[output colorized]' \
                     '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
+                    '--spec[Path to the spec file]:spec:_files' \
+                    '--stdin[Spec as STDIN]' \
                     && ret=0
 
-                case $state in
-                spec_file)
-_files
-                ;;
-                esac
 
             ;;
             validate)
@@ -165,18 +157,14 @@ _files
                 # ---- Command: validate
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '2: :->spec_file' \
                     '--color[output colorized]' \
                     '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
+                    '--spec[Path to the spec file]:spec:_files' \
+                    '--stdin[Spec as STDIN]' \
                     && ret=0
 
-                case $state in
-                spec_file)
-_files
-                ;;
-                esac
 
             ;;
             esac

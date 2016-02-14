@@ -10,6 +10,25 @@ our $VERSION = '0.000'; # VERSION
 
 use base 'App::Spec::Run';
 
+sub read_spec {
+    my ($self) = @_;
+    my $options = $self->options;
+
+    my $spec;
+    if ($options->{stdin}) {
+        my $text = do { local $/; <STDIN> };
+        $spec = App::Spec->read(\$text);
+    }
+    elsif ($options->{spec}) {
+        my $spec_file = $options->{spec};
+        $spec = App::Spec->read($spec_file);
+    }
+    else {
+        die "Please specify spec with --spec or --stdin";
+    }
+    return $spec;
+}
+
 sub cmd_completion {
     my ($self) = @_;
     my $options = $self->options;
@@ -18,8 +37,7 @@ sub cmd_completion {
     my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
     die "Specify which shell" unless $shell;
 
-    my $spec_file = $parameters->{spec_file};
-    my $spec = App::Spec->read($spec_file);
+    my $spec = $self->read_spec;
     my $completion = $spec->generate_completion(
         shell => $shell,
     );
@@ -30,8 +48,7 @@ sub generate_pod {
     my ($self) = @_;
     my $parameters = $self->parameters;
 
-    my $spec_file = $parameters->{spec_file};
-    my $spec = App::Spec->read($spec_file);
+    my $spec = $self->read_spec;
     my $pod = $spec->generate_pod(
     );
     say $pod;
@@ -39,7 +56,9 @@ sub generate_pod {
 
 sub colorize {
     my ($self) = @_;
-    my $color = $self->options->{color};
+    # TODO
+    my $options = $self->options || {};
+    my $color = $options->{color};
     my $env_color = $ENV{PERL5_APPSPEC_COLOR_OUTPUT} // 1;
     return unless -t STDOUT;
     return ($color || $env_color);
@@ -47,13 +66,21 @@ sub colorize {
 
 sub validate {
     my ($self) = @_;
+    my $options = $self->options;
     my $parameters = $self->parameters;
     my $color = $self->colorize;
 
-    my $specfile = $parameters->{spec_file};
+    my @errors;
     require App::AppSpec::Schema::Validator;
     my $validator = App::AppSpec::Schema::Validator->new;
-    my @errors = $validator->validate_spec_file($specfile);
+    if ($options->{stdin}) {
+        my $text = do { local $/; <STDIN> };
+        @errors = $validator->validate_spec($text);
+    }
+    else {
+        my $spec_file = $options->{spec};
+        @errors = $validator->validate_spec_file($spec_file);
+    }
     binmode STDOUT, ":encoding(utf-8)";
     if (@errors) {
         print $validator->format_errors(\@errors);

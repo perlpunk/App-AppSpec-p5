@@ -12,7 +12,7 @@ _appspec() {
     case $COMP_CWORD in
 
     1)
-        _appspec_compreply '_complete -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help -- Show command help'$'\n''pod -- Generate pod'$'\n''validate -- Validate spec file'
+        _appspec_compreply '_complete  -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help       -- Show command help'$'\n''pod        -- Generate pod'$'\n''validate   -- Validate spec file'
 
     ;;
     *)
@@ -22,6 +22,10 @@ _appspec() {
         case $COMP_CWORD in
         *)
         case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --color|-C)
+          ;;
+          --help|-h)
+          ;;
           --name)
           ;;
           --zsh)
@@ -30,7 +34,7 @@ _appspec() {
           ;;
 
           *)
-            _appspec_compreply "'--name -- name of the program'"$'\n'"'--zsh -- for zsh'"$'\n'"'--bash -- for bash'"
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
           ;;
         esac
         ;;
@@ -38,10 +42,16 @@ _appspec() {
       ;;
       completion)
         case $COMP_CWORD in
-        2)
-        ;;
         *)
         case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --color|-C)
+          ;;
+          --help|-h)
+          ;;
+          --spec)
+          ;;
+          --stdin)
+          ;;
           --name)
           ;;
           --zsh)
@@ -50,7 +60,7 @@ _appspec() {
           ;;
 
           *)
-            _appspec_compreply "'--name -- name of the program'"$'\n'"'--zsh -- for zsh'"$'\n'"'--bash -- for bash'"
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
           ;;
         esac
         ;;
@@ -60,7 +70,7 @@ _appspec() {
         case $COMP_CWORD in
 
         2)
-            _appspec_compreply '_complete'$'\n''completion'$'\n''pod'$'\n''validate'
+            _appspec_compreply '_complete '$'\n''completion'$'\n''pod       '$'\n''validate  '
 
         ;;
         *)
@@ -81,13 +91,41 @@ _appspec() {
       ;;
       pod)
         case $COMP_CWORD in
-        2)
+        *)
+        case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --color|-C)
+          ;;
+          --help|-h)
+          ;;
+          --spec)
+          ;;
+          --stdin)
+          ;;
+
+          *)
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"
+          ;;
+        esac
         ;;
         esac
       ;;
       validate)
         case $COMP_CWORD in
-        2)
+        *)
+        case ${COMP_WORDS[$COMP_CWORD-1]} in
+          --color|-C)
+          ;;
+          --help|-h)
+          ;;
+          --spec)
+          ;;
+          --stdin)
+          ;;
+
+          *)
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"
+          ;;
+        esac
         ;;
         esac
       ;;
@@ -100,8 +138,9 @@ _appspec() {
 
 _appspec_compreply() {
     IFS=$'\n' COMPREPLY=($(compgen -W "$1" -- ${COMP_WORDS[COMP_CWORD]}))
-    if [[ ${#COMPREPLY[*]} -eq 1 ]]; then #Only one completion
-        COMPREPLY=( ${COMPREPLY[0]%% -- *} ) #Remove ' -- ' and everything after
+    if [[ ${#COMPREPLY[*]} -eq 1 ]]; then # Only one completion
+        COMPREPLY=( ${COMPREPLY[0]%% -- *} ) # Remove ' -- ' and everything after
+        COMPREPLY="$(echo -e "$COMPREPLY" | sed -e 's/[[:space:]]*$//')"
     fi
 }
 
