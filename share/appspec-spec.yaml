@@ -13,14 +13,6 @@ subcommands:
     summary: Generate completion for a specified spec file
     op: cmd_completion
     options:
-    - &option_spec_file
-      name: spec
-      type: file
-      summary: Path to the spec file
-    - &option_spec_stdin
-      name: stdin
-      type: bool
-      summary: Spec as STDIN
     - name: name
       description: name of the program
     - name: zsh
@@ -29,16 +21,20 @@ subcommands:
     - name: bash
       description: for bash
       type: bool
+    parameters:
+    - &param_spec_file
+      name: spec_file
+      type: file
+      required: true
+      summary: Path to the spec file (use '-' for standard input)
   pod:
     summary: Generate pod
     op: generate_pod
-    options:
-    - *option_spec_file
-    - *option_spec_stdin
+    parameters:
+    - *param_spec_file
   validate:
     summary: Validate spec file
     op: validate
-    options:
-    - *option_spec_file
-    - *option_spec_stdin
+    parameters:
+    - *param_spec_file
 # vim:et:sts=2:sws=2:sw=2:foldmethod=indent

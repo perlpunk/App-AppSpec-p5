@@ -42,15 +42,13 @@ _appspec() {
       ;;
       completion)
         case $COMP_CWORD in
+        2)
+        ;;
         *)
         case ${COMP_WORDS[$COMP_CWORD-1]} in
           --color|-C)
           ;;
           --help|-h)
-          ;;
-          --spec)
-          ;;
-          --stdin)
           ;;
           --name)
           ;;
@@ -60,7 +58,7 @@ _appspec() {
           ;;
 
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
           ;;
         esac
         ;;
@@ -91,19 +89,17 @@ _appspec() {
       ;;
       pod)
         case $COMP_CWORD in
+        2)
+        ;;
         *)
         case ${COMP_WORDS[$COMP_CWORD-1]} in
           --color|-C)
           ;;
           --help|-h)
           ;;
-          --spec)
-          ;;
-          --stdin)
-          ;;
 
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"
           ;;
         esac
         ;;
@@ -111,19 +107,17 @@ _appspec() {
       ;;
       validate)
         case $COMP_CWORD in
+        2)
+        ;;
         *)
         case ${COMP_WORDS[$COMP_CWORD-1]} in
           --color|-C)
           ;;
           --help|-h)
           ;;
-          --spec)
-          ;;
-          --stdin)
-          ;;
 
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--spec  -- Path to the spec file'"$'\n'"'--stdin -- Spec as STDIN'"
+            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"
           ;;
         esac
         ;;

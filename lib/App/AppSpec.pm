@@ -12,20 +12,10 @@ use base 'App::Spec::Run';
 
 sub read_spec {
     my ($self) = @_;
-    my $options = $self->options;
+    my $parameters = $self->parameters;
 
-    my $spec;
-    if ($options->{stdin}) {
-        my $text = do { local $/; <STDIN> };
-        $spec = App::Spec->read(\$text);
-    }
-    elsif ($options->{spec}) {
-        my $spec_file = $options->{spec};
-        $spec = App::Spec->read($spec_file);
-    }
-    else {
-        die "Please specify spec with --spec or --stdin";
-    }
+    my $spec_file = $parameters->{spec_file};
+    my $spec = App::Spec->read($spec_file);
     return $spec;
 }
 
