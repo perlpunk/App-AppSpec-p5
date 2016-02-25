@@ -217,7 +217,7 @@ ${indent}    _${appname}_compreply "@list"
 EOM
                 }
             }
-            elsif ($type eq "bool") {
+            elsif ($type eq "flag") {
             }
             elsif ($type eq "file" or $type eq "dir") {
             }
@@ -259,15 +259,18 @@ sub dynamic_completion {
     my $level = $args{level};
     my $indent = '        ' x $level;
     my $name = $p->name;
+    my $shell_name = $name;
+    $name =~ tr/^A-Za-z0-9_:-/_/c;
+    $shell_name =~ tr/^A-Za-z0-9_/_/c;
     my $def = $p->completion;
     my $command = $def->{command};
+    my $command_string = $def->{command_string};
     my $op = $def->{op};
-    my @args;
     my $appname = $self->spec->name;
     my $function_name = "_${appname}_"
         . join ("_", @$previous)
         . "_" . ($p->isa("App::Spec::Option") ? "option" : "param")
-        . "_" . $name . "_completion";
+        . "_" . $shell_name . "_completion";
 
     my $function;
     if ($op) {
@@ -279,43 +282,53 @@ $function_name() \{
 \}
 EOM
     }
-    elsif ($command) {
-        for my $arg (@$command) {
-            unless (ref $arg) {
-                push @args, "'$arg'";
-                next;
-            }
-            if (my $replace = $arg->{replace}) {
-                if (ref $replace eq 'ARRAY') {
-                    my @repl = @$replace;
-                    if ($replace->[0] eq 'SHELL_WORDS') {
-                        my $num = $replace->[1];
-                        my $index = "\$COMP_CWORD";
-                        if ($num ne 'CURRENT') {
-                            if ($num =~ m/^-/) {
-                                $index .= $num;
+    elsif ($command or $command_string) {
+
+        my $string = '';
+        if ($command) {
+            my @args;
+
+            for my $arg (@$command) {
+                unless (ref $arg) {
+                    push @args, "'$arg'";
+                    next;
+                }
+                if (my $replace = $arg->{replace}) {
+                    if (ref $replace eq 'ARRAY') {
+                        my @repl = @$replace;
+                        if ($replace->[0] eq 'SHELL_WORDS') {
+                            my $num = $replace->[1];
+                            my $index = "\$COMP_CWORD";
+                            if ($num ne 'CURRENT') {
+                                if ($num =~ m/^-/) {
+                                    $index .= $num;
+                                }
+                                else {
+                                    $index = $num - 1;
+                                }
                             }
-                            else {
-                                $index = $num - 1;
-                            }
+                            my $string = qq{"\$\{COMP_WORDS\[$index\]\}"};
+                            push @args, $string;
                         }
-                        my $string = qq{"\$\{COMP_WORDS\[$index\]\}"};
-                        push @args, $string;
                     }
-                }
-                else {
-                    if ($replace eq "SELF") {
-                        push @args, "\$program";
+                    else {
+                        if ($replace eq "SELF") {
+                            push @args, "\$program";
+                        }
                     }
                 }
             }
+            $string = "@args";
+        }
+        elsif (defined $command_string) {
+            $string = $command_string;
         }
         my $varname = "__${name}_completion";
 
         $function = <<"EOM";
 $function_name() \{
-    local param_$name=`@args`
-    _${appname}_compreply "\$param_$name"
+    local param_$shell_name=`$string`
+    _${appname}_compreply "\$param_$shell_name"
 \}
 EOM
     }
