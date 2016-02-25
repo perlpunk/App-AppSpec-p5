@@ -6,7 +6,7 @@ title: Utility for reading specification for cli apps
 options:
   - name: color
     summary: output colorized
-    type: bool
+    type: flag
     aliases: [C]
 subcommands:
   completion:
@@ -17,10 +17,10 @@ subcommands:
       description: name of the program
     - name: zsh
       description: for zsh
-      type: bool
+      type: flag
     - name: bash
       description: for bash
-      type: bool
+      type: flag
     parameters:
     - &param_spec_file
       name: spec_file
