@@ -1,8 +1,11 @@
 ---
 name: appspec
 appspec: { version: 0.001 }
-version: 1
-title: Utility for reading specification for cli apps
+title: Utilities for spec files for App::Spec cli apps
+markup: swim
+description: |
+  This script is a collection of tools for authors of [App::Spec] command line
+  scripts.
 options:
   - name: color
     summary: output colorized
@@ -11,6 +14,9 @@ options:
 subcommands:
   completion:
     summary: Generate completion for a specified spec file
+    description: |
+      This command takes a spec file and outputs the corresponding
+      shell script for tab completion.
     op: cmd_completion
     options:
     - name: name
@@ -29,11 +35,17 @@ subcommands:
       summary: Path to the spec file (use '-' for standard input)
   pod:
     summary: Generate pod
+    description: |
+      This command takes a spec file and outputs the generated pod
+      documentation.
     op: generate_pod
     parameters:
     - *param_spec_file
   validate:
     summary: Validate spec file
+    description: |
+      This command takes a spec file and validates it against the current
+      [App::Spec] schema.
     op: validate
     parameters:
     - *param_spec_file

@@ -1,9 +1,12 @@
 #!/usr/bin/env perl
+# ABSTRACT: Various utilities for App::Spec files
 # vim:et:sts=4:sws=4:sw=4
 use strict;
 use warnings;
 use 5.010;
 use Data::Dumper;
+
+our $VERSION = '0.000'; # VERSION
 
 use App::Spec;
 use App::AppSpec;

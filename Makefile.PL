@@ -21,8 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-AppSpec",
   "EXE_FILES" => [
-    "bin/appspec",
-    "bin/appspec.pod"
+    "bin/appspec"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",

@@ -1,0 +1,97 @@
+=head1 NAME
+
+appspec - Utilities for spec files for App::Spec cli apps
+
+=head1 ABSTRACT
+
+
+
+=head1 DESCRIPTION
+
+This script is a collection of tools for authors of L<App::Spec> command line scripts.
+
+
+=head2 GLOBAL OPTIONS
+
+    --color -C    output colorized 
+    --help -h     Show command help
+
+
+=head2 SUBCOMMANDS
+
+=head3  completion
+
+    appspec  completion [options] <spec_file>
+
+Generate completion for a specified spec file
+
+
+This command takes a spec file and outputs the corresponding shell script for tab completion.
+
+
+Options:
+
+    --name    name of the program
+    --zsh     for zsh            
+    --bash    for bash           
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  pod
+
+    appspec  pod <spec_file>
+
+Generate pod
+
+
+This command takes a spec file and outputs the generated pod documentation.
+
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  validate
+
+    appspec  validate <spec_file>
+
+Validate spec file
+
+
+This command takes a spec file and validates it against the current L<App::Spec> schema.
+
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  help
+
+    appspec  help <subcommands> [options]
+
+Show command help
+
+
+Options:
+
+    --all    
+
+
+=head3  _complete
+
+    appspec  _complete [options]
+
+Generate self completion
+
+
+Options:
+
+    --name    name of the program
+    --zsh     for zsh            
+    --bash    for bash           
+
+
+
+
