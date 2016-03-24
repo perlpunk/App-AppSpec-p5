@@ -13,8 +13,8 @@ This script is a collection of tools for authors of L<App::Spec> command line sc
 
 =head2 GLOBAL OPTIONS
 
-    --color -C    output colorized 
-    --help -h     Show command help
+    --color -C    output colorized (flag) 
+    --help -h     Show command help (flag)
 
 
 =head2 SUBCOMMANDS
@@ -32,8 +32,8 @@ This command takes a spec file and outputs the corresponding shell script for ta
 Options:
 
     --name    name of the program
-    --zsh     for zsh            
-    --bash    for bash           
+    --zsh     for zsh (flag)     
+    --bash    for bash (flag)    
 
 Parameters:
 
@@ -76,7 +76,7 @@ Show command help
 
 Options:
 
-    --all    
+    --all     (flag)
 
 
 =head3  _complete
@@ -89,8 +89,8 @@ Generate self completion
 Options:
 
     --name    name of the program
-    --zsh     for zsh            
-    --bash    for bash           
+    --zsh     for zsh (flag)     
+    --bash    for bash (flag)    
 
 
 
