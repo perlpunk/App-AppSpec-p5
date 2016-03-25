@@ -6,11 +6,8 @@ markup: swim
 description: |
   This script is a collection of tools for authors of [App::Spec] command line
   scripts.
-options:
-  - name: color
-    summary: output colorized
-    type: flag
-    aliases: [C]
+options: []
+
 subcommands:
   completion:
     summary: Generate completion for a specified spec file
@@ -33,6 +30,32 @@ subcommands:
       type: file
       required: true
       summary: Path to the spec file (use '-' for standard input)
+
+  new:
+    summary: Create new app
+    op: cmd_new
+    description: |
+      This command creates a skeleton for a new app.
+      It will create a directory for your app and write a skeleton
+      spec file.
+    options:
+    - name: name
+      summary: The (file) name of the app
+      aliases: [n]
+      required: true
+    - name: class
+      summary: The main class name for your app implementation
+      aliases: [c]
+      required: true
+    - name: overwrite
+      summary: Overwrite existing dist directory
+      type: flag
+      aliases: [o]
+    - name: with-subcommands
+      summary: Create an app with subcommands
+      type: flag
+      aliases: [s]
+
   pod:
     summary: Generate pod
     description: |
@@ -41,6 +64,7 @@ subcommands:
     op: generate_pod
     parameters:
     - *param_spec_file
+
   validate:
     summary: Validate spec file
     description: |
@@ -49,4 +73,9 @@ subcommands:
     op: validate
     parameters:
     - *param_spec_file
+    options:
+    - name: color
+      summary: output colorized
+      type: flag
+      aliases: [C]
 # vim:et:sts=2:sws=2:sw=2:foldmethod=indent

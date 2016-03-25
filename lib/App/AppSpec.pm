@@ -85,4 +85,60 @@ sub validate {
     }
 }
 
+sub cmd_new {
+    my ($self) = @_;
+    my $options = $self->options;
+    require File::Path;
+
+    my $name = $options->{name};
+    my $class = $options->{class};
+    my $overwrite = $options->{overwrite};
+    unless ($name =~ m/^\w[\w+-]*/) {
+        die "Option name '$name': invalid app name";
+    }
+    unless ($class =~ m/^[a-zA-Z]\w*(::\w+)+$/) {
+        die "Option class '$class': invalid classname";
+    }
+    my $dist = $class;
+    $dist =~ s/::/-/g;
+    if (-d $dist and not $overwrite) {
+        die "Directory $dist already exists";
+    }
+    elsif (-d $dist) {
+        say "Removing old $dist directory first";
+        File::Path::remove_tree($dist);
+    }
+    my $spec = <<"EOM";
+name: $name
+appspec: { version: '0.001' }
+class: $class
+title: 'app title'
+description: 'app description'
+options:
+- name: "some-option"
+  type: "flag"
+  summary: "option summary"
+EOM
+    if ($options->{"with-subcommands"}) {
+            $spec .= <<"EOM";
+subcommands:
+    mycommand:
+      summary: "Summary for mycommand"
+      op: "mycommand"
+      description: "Description for mycommand"
+    parameters:
+      - name: "myparam"
+        summary: "Summary for myparam"
+        required: 1
+EOM
+    }
+    File::Path::make_path($dist);
+    File::Path::make_path("$dist/share");
+    my $specfile = "$dist/share/$name-spec.yaml";
+    say "Writig spec to $specfile";
+    open my $fh, ">", $specfile;
+    print $fh $spec;
+    close $fh;
+}
+
 1;
