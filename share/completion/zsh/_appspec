@@ -15,7 +15,7 @@ _appspec() {
 
         case $state in
         cmd1)
-            _alternative 'args:cmd2:((_complete\:"Generate self completion" completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod" validate\:"Validate spec file"))'
+            _alternative 'args:cmd2:((completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod" validate\:"Validate spec file"))'
         ;;
 
         args)
@@ -32,6 +32,19 @@ _appspec() {
                     '--name[name of the program]:name' \
                     '--zsh[for zsh]' \
                     '--bash[for bash]' \
+                    && ret=0
+
+
+            ;;
+            _pod)
+
+                # ---- Command: _pod
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
                     && ret=0
 
 
@@ -70,7 +83,7 @@ _files
 
                 case $state in
                 cmd2)
-                    _alternative 'args:cmd3:((_complete completion pod validate))'
+                    _alternative 'args:cmd3:((completion pod validate))'
                 ;;
 
                 args)
@@ -78,6 +91,21 @@ _files
                     _complete)
 
                         # ---- Command: help _complete
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--color[output colorized]' \
+                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    _pod)
+
+                        # ---- Command: help _pod
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \

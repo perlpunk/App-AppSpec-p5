@@ -8,79 +8,109 @@ _appspec() {
     local program=appspec
     local cur=${COMP_WORDS[$COMP_CWORD]}
 #    echo "COMP_CWORD:$COMP_CWORD cur:$cur" >>/tmp/comp
+    declare -a FLAGS
+    declare -a OPTIONS
+    declare -a MYWORDS
 
-    case $COMP_CWORD in
+    local INDEX=`expr $COMP_CWORD - 1`
+    MYWORDS=("${COMP_WORDS[@]:1:$COMP_CWORD}")
 
-    1)
-        _appspec_compreply '_complete  -- Generate self completion'$'\n''completion -- Generate completion for a specified spec file'$'\n''help       -- Show command help'$'\n''pod        -- Generate pod'$'\n''validate   -- Validate spec file'
+    FLAGS=('--color' 'output colorized' '-C' 'output colorized' '--help' 'Show command help' '-h' 'Show command help')
+    OPTIONS=()
+    __appspec_handle_options_flags
+
+    case $INDEX in
+
+    0)
+        __comp_current_options || return
+        __appspec_dynamic_comp 'commands' 'completion'$'\t''Generate completion for a specified spec file'$'\n''help'$'\t''Show command help'$'\n''pod'$'\t''Generate pod'$'\n''validate'$'\t''Validate spec file'
 
     ;;
     *)
     # subcmds
-    case ${COMP_WORDS[1]} in
+    case ${MYWORDS[0]} in
       _complete)
-        case $COMP_CWORD in
-        *)
-        case ${COMP_WORDS[$COMP_CWORD-1]} in
-          --color|-C)
-          ;;
-          --help|-h)
-          ;;
-          --name)
-          ;;
-          --zsh)
-          ;;
-          --bash)
-          ;;
-
+        FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
+        OPTIONS+=('--name' 'name of the program')
+        __appspec_handle_options_flags
+          case $INDEX in
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
-          ;;
-        esac
-        ;;
+            __comp_current_options true || return # after parameters
+            case ${MYWORDS[$INDEX-1]} in
+              --name)
+              ;;
+
+            esac
+            ;;
         esac
       ;;
+      _pod)
+        FLAGS+=()
+        OPTIONS+=()
+        __appspec_handle_options_flags
+        __comp_current_options true || return # no subcmds, no params/opts
+      ;;
       completion)
-        case $COMP_CWORD in
-        2)
-        ;;
-        *)
-        case ${COMP_WORDS[$COMP_CWORD-1]} in
-          --color|-C)
+        FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
+        OPTIONS+=('--name' 'name of the program')
+        __appspec_handle_options_flags
+          case $INDEX in
+          1)
+              __comp_current_options || return
           ;;
-          --help|-h)
-          ;;
-          --name)
-          ;;
-          --zsh)
-          ;;
-          --bash)
-          ;;
-
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"$'\n'"'--name  -- name of the program'"$'\n'"'--zsh   -- for zsh'"$'\n'"'--bash  -- for bash'"
-          ;;
-        esac
-        ;;
+            __comp_current_options true || return # after parameters
+            case ${MYWORDS[$INDEX-1]} in
+              --name)
+              ;;
+
+            esac
+            ;;
         esac
       ;;
       help)
-        case $COMP_CWORD in
+        FLAGS+=('--all' '')
+        OPTIONS+=()
+        __appspec_handle_options_flags
+        case $INDEX in
 
-        2)
-            _appspec_compreply '_complete '$'\n''completion'$'\n''pod       '$'\n''validate  '
+        1)
+            __comp_current_options || return
+            __appspec_dynamic_comp 'commands' 'completion'$'\n''pod'$'\n''validate'
 
         ;;
         *)
         # subcmds
-        case ${COMP_WORDS[2]} in
+        case ${MYWORDS[1]} in
           _complete)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
+          ;;
+          _pod)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
           ;;
           completion)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
           ;;
           pod)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
           ;;
           validate)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
           ;;
         esac
 
@@ -88,39 +118,35 @@ _appspec() {
         esac
       ;;
       pod)
-        case $COMP_CWORD in
-        2)
-        ;;
-        *)
-        case ${COMP_WORDS[$COMP_CWORD-1]} in
-          --color|-C)
+        FLAGS+=()
+        OPTIONS+=()
+        __appspec_handle_options_flags
+          case $INDEX in
+          1)
+              __comp_current_options || return
           ;;
-          --help|-h)
-          ;;
-
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"
-          ;;
-        esac
-        ;;
+            __comp_current_options true || return # after parameters
+            case ${MYWORDS[$INDEX-1]} in
+
+            esac
+            ;;
         esac
       ;;
       validate)
-        case $COMP_CWORD in
-        2)
-        ;;
-        *)
-        case ${COMP_WORDS[$COMP_CWORD-1]} in
-          --color|-C)
+        FLAGS+=()
+        OPTIONS+=()
+        __appspec_handle_options_flags
+          case $INDEX in
+          1)
+              __comp_current_options || return
           ;;
-          --help|-h)
-          ;;
-
           *)
-            _appspec_compreply "'--color -- output colorized'"$'\n'"'-C      -- output colorized'"$'\n'"'--help  -- Show command help'"$'\n'"'-h      -- Show command help'"
-          ;;
-        esac
-        ;;
+            __comp_current_options true || return # after parameters
+            case ${MYWORDS[$INDEX-1]} in
+
+            esac
+            ;;
         esac
       ;;
     esac
@@ -143,6 +169,7 @@ __appspec_dynamic_comp() {
     local argname="$1"
     local arg="$2"
     local comp name desc cols desclength formatted
+    local max=0
 
     while read -r line; do
         name="$line"
@@ -163,14 +190,101 @@ __appspec_dynamic_comp() {
             cols=`tput cols`
             [[ -z $cols ]] && cols=80
             desclength=`expr $cols - 4 - $max`
-            formatted=`printf "%-*s -- %-*s" "$max" "$name" "$desclength" "$desc"`
+            formatted=`printf "'%-*s -- %-*s'" "$max" "$name" "$desclength" "$desc"`
             comp="$comp$formatted"$'\n'
         else
-            comp="$comp$name"$'\n'
+            comp="$comp'$name'"$'\n'
         fi
     done <<< "$arg"
     _appspec_compreply "$comp"
 }
+
+function __appspec_handle_options() {
+    local i j
+    declare -a copy
+    local last="${MYWORDS[$INDEX]}"
+    local max=`expr ${#MYWORDS[@]} - 1`
+    for ((i=0; i<$max; i++))
+    do
+        local word="${MYWORDS[$i]}"
+        local found=
+        for ((j=0; j<${#OPTIONS[@]}; j+=2))
+        do
+            local option="${OPTIONS[$j]}"
+            if [[ "$word" == "$option" ]]; then
+                found=1
+                i=`expr $i + 1`
+                break
+            fi
+        done
+        if [[ -n $found && $i -lt $max ]]; then
+            INDEX=`expr $INDEX - 2`
+        else
+            copy+=("$word")
+        fi
+    done
+    MYWORDS=("${copy[@]}" "$last")
+}
+
+function __appspec_handle_flags() {
+    local i j
+    declare -a copy
+    local last="${MYWORDS[$INDEX]}"
+    local max=`expr ${#MYWORDS[@]} - 1`
+    for ((i=0; i<$max; i++))
+    do
+        local word="${MYWORDS[$i]}"
+        local found=
+        for ((j=0; j<${#FLAGS[@]}; j+=2))
+        do
+            local flag="${FLAGS[$j]}"
+            if [[ "$word" == "$flag" ]]; then
+                found=1
+                break
+            fi
+        done
+        if [[ -n $found ]]; then
+            INDEX=`expr $INDEX - 1`
+        else
+            copy+=("$word")
+        fi
+    done
+    MYWORDS=("${copy[@]}" "$last")
+}
+
+__appspec_handle_options_flags() {
+    __appspec_handle_options
+    __appspec_handle_flags
+}
+
+__comp_current_options() {
+    local always="$1"
+    if [[ -n $always || ${MYWORDS[$INDEX]} =~ ^- ]]; then
+
+      local options_spec=''
+      local j=
+
+      for ((j=0; j<${#FLAGS[@]}; j+=2))
+      do
+          local name="${FLAGS[$j]}"
+          local desc="${FLAGS[$j+1]}"
+          options_spec+="$name"$'\t'"$desc"$'\n'
+      done
+
+      for ((j=0; j<${#OPTIONS[@]}; j+=2))
+      do
+          local name="${OPTIONS[$j]}"
+          local desc="${OPTIONS[$j+1]}"
+          options_spec+="$name"$'\t'"$desc"$'\n'
+      done
+      __appspec_dynamic_comp 'options' "$options_spec"
+
+      return 1
+    else
+      return 0
+    fi
+}
+
 
 complete -o default -F _appspec appspec
 
