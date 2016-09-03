@@ -15,7 +15,7 @@ _appspec() {
     local INDEX=`expr $COMP_CWORD - 1`
     MYWORDS=("${COMP_WORDS[@]:1:$COMP_CWORD}")
 
-    FLAGS=('--color' 'output colorized' '-C' 'output colorized' '--help' 'Show command help' '-h' 'Show command help')
+    FLAGS=('--help' 'Show command help' '-h' 'Show command help')
     OPTIONS=()
     __appspec_handle_options_flags
 
@@ -23,7 +23,7 @@ _appspec() {
 
     0)
         __comp_current_options || return
-        __appspec_dynamic_comp 'commands' 'completion'$'\t''Generate completion for a specified spec file'$'\n''help'$'\t''Show command help'$'\n''pod'$'\t''Generate pod'$'\n''validate'$'\t''Validate spec file'
+        __appspec_dynamic_comp 'commands' 'completion'$'\t''Generate completion for a specified spec file'$'\n''help'$'\t''Show command help'$'\n''new'$'\t''Create new app'$'\n''pod'$'\t''Generate pod'$'\n''validate'$'\t''Validate spec file'
 
     ;;
     *)
@@ -76,7 +76,7 @@ _appspec() {
 
         1)
             __comp_current_options || return
-            __appspec_dynamic_comp 'commands' 'completion'$'\n''pod'$'\n''validate'
+            __appspec_dynamic_comp 'commands' 'completion'$'\n''new'$'\n''pod'$'\n''validate'
 
         ;;
         *)
@@ -100,6 +100,12 @@ _appspec() {
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
+          new)
+            FLAGS+=()
+            OPTIONS+=()
+            __appspec_handle_options_flags
+            __comp_current_options true || return # no subcmds, no params/opts
+          ;;
           pod)
             FLAGS+=()
             OPTIONS+=()
@@ -115,6 +121,26 @@ _appspec() {
         esac
 
         ;;
+        esac
+      ;;
+      new)
+        FLAGS+=('--overwrite' 'Overwrite existing dist directory' '-o' 'Overwrite existing dist directory' '--with-subcommands' 'Create an app with subcommands' '-s' 'Create an app with subcommands')
+        OPTIONS+=('--name' 'The (file) name of the app' '-n' 'The (file) name of the app' '--class' 'The main class name for your app implementation' '-c' 'The main class name for your app implementation')
+        __appspec_handle_options_flags
+          case $INDEX in
+          1)
+              __comp_current_options || return
+          ;;
+          *)
+            __comp_current_options true || return # after parameters
+            case ${MYWORDS[$INDEX-1]} in
+              --name|-n)
+              ;;
+              --class|-c)
+              ;;
+
+            esac
+            ;;
         esac
       ;;
       pod)
@@ -134,7 +160,7 @@ _appspec() {
         esac
       ;;
       validate)
-        FLAGS+=()
+        FLAGS+=('--color' 'output colorized' '-C' 'output colorized')
         OPTIONS+=()
         __appspec_handle_options_flags
           case $INDEX in

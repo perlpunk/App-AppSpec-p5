@@ -5,6 +5,7 @@ use 5.010;
 use utf8;
 package App::AppSpec;
 use Term::ANSIColor;
+use File::Basename qw/ dirname /;
 
 our $VERSION = '0.000'; # VERSION
 
@@ -88,6 +89,8 @@ sub validate {
 sub cmd_new {
     my ($self) = @_;
     my $options = $self->options;
+    my $params = $self->parameters;
+    my $dist_path = $params->{path};
     require File::Path;
 
     my $name = $options->{name};
@@ -101,6 +104,7 @@ sub cmd_new {
     }
     my $dist = $class;
     $dist =~ s/::/-/g;
+    $dist = $dist_path // $dist;
     if (-d $dist and not $overwrite) {
         die "Directory $dist already exists";
     }
@@ -119,6 +123,37 @@ options:
   type: "flag"
   summary: "option summary"
 EOM
+    my $module = <<"EOM";
+package $class;
+use strict;
+use warnings;
+use feature qw/ say /;
+use base 'App::Spec::Run';
+
+sub mycommand \{
+    my (\$self) = \@_;
+    my \$options = \$self->options;
+    my \$parameters = \$self->parameters;
+
+    say "Hello world";
+\}
+
+1;
+EOM
+    my $script = <<"EOM";
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use App::Spec;
+use App::AppSpec;
+use File::Share qw/ dist_file /;
+
+my \$specfile = dist_file("$dist", "$name-spec.yaml");
+my \$spec = App::Spec->read(\$specfile);
+my \$run = \$spec->runner;
+\$run->run;
+EOM
     if ($options->{"with-subcommands"}) {
             $spec .= <<"EOM";
 subcommands:
@@ -132,12 +167,25 @@ subcommands:
         required: 1
 EOM
     }
+    my $module_path = $class;
+    $module_path =~ s#::#/#g;
+    $module_path = "$dist/lib/$module_path.pm";
     File::Path::make_path($dist);
     File::Path::make_path("$dist/share");
+    File::Path::make_path("$dist/bin");
+    File::Path::make_path(dirname $module_path);
     my $specfile = "$dist/share/$name-spec.yaml";
     say "Writig spec to $specfile";
-    open my $fh, ">", $specfile;
+    open my $fh, ">", $specfile or die $!;
     print $fh $spec;
+    close $fh;
+
+    open $fh, ">", $module_path or die $!;
+    print $fh $module;
+    close $fh;
+
+    open $fh, ">", "$dist/bin/$name" or die $!;
+    print $fh $script;
     close $fh;
 }
 

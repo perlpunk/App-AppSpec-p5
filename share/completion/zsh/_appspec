@@ -15,7 +15,7 @@ _appspec() {
 
         case $state in
         cmd1)
-            _alternative 'args:cmd2:((completion\:"Generate completion for a specified spec file" help\:"Show command help" pod\:"Generate pod" validate\:"Validate spec file"))'
+            _alternative 'args:cmd2:((completion\:"Generate completion for a specified spec file" help\:"Show command help" new\:"Create new app" pod\:"Generate pod" validate\:"Validate spec file"))'
         ;;
 
         args)
@@ -25,8 +25,6 @@ _appspec() {
                 # ---- Command: _complete
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '--color[output colorized]' \
-                    '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
                     '--name[name of the program]:name' \
@@ -41,8 +39,6 @@ _appspec() {
                 # ---- Command: _pod
                 _arguments -s -C \
                     '1: :->cmd1' \
-                    '--color[output colorized]' \
-                    '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
                     && ret=0
@@ -55,8 +51,6 @@ _appspec() {
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->spec_file' \
-                    '--color[output colorized]' \
-                    '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
                     '--name[name of the program]:name' \
@@ -83,7 +77,7 @@ _files
 
                 case $state in
                 cmd2)
-                    _alternative 'args:cmd3:((completion pod validate))'
+                    _alternative 'args:cmd3:((completion new pod validate))'
                 ;;
 
                 args)
@@ -94,8 +88,6 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '--color[output colorized]' \
-                            '-C[output colorized]' \
                             '--help[Show command help]' \
                             '-h[Show command help]' \
                             '--all[]' \
@@ -109,8 +101,6 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '--color[output colorized]' \
-                            '-C[output colorized]' \
                             '--help[Show command help]' \
                             '-h[Show command help]' \
                             '--all[]' \
@@ -124,8 +114,19 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '--color[output colorized]' \
-                            '-C[output colorized]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    new)
+
+                        # ---- Command: help new
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
                             '--help[Show command help]' \
                             '-h[Show command help]' \
                             '--all[]' \
@@ -139,8 +140,6 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '--color[output colorized]' \
-                            '-C[output colorized]' \
                             '--help[Show command help]' \
                             '-h[Show command help]' \
                             '--all[]' \
@@ -154,8 +153,6 @@ _files
                         _arguments -s -C \
                             '1: :->cmd1' \
                             '2: :->cmd2' \
-                            '--color[output colorized]' \
-                            '-C[output colorized]' \
                             '--help[Show command help]' \
                             '-h[Show command help]' \
                             '--all[]' \
@@ -169,14 +166,37 @@ _files
 
                 esac
             ;;
+            new)
+
+                # ---- Command: new
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->path' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--name[The (file) name of the app]:name' \
+                    '-n[The (file) name of the app]:name' \
+                    '--class[The main class name for your app implementation]:class' \
+                    '-c[The main class name for your app implementation]:class' \
+                    '--overwrite[Overwrite existing dist directory]' \
+                    '-o[Overwrite existing dist directory]' \
+                    '--with-subcommands[Create an app with subcommands]' \
+                    '-s[Create an app with subcommands]' \
+                    && ret=0
+
+                case $state in
+                path)
+
+                ;;
+                esac
+
+            ;;
             pod)
 
                 # ---- Command: pod
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->spec_file' \
-                    '--color[output colorized]' \
-                    '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
                     && ret=0
@@ -194,10 +214,10 @@ _files
                 _arguments -s -C \
                     '1: :->cmd1' \
                     '2: :->spec_file' \
-                    '--color[output colorized]' \
-                    '-C[output colorized]' \
                     '--help[Show command help]' \
                     '-h[Show command help]' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
                     && ret=0
 
                 case $state in

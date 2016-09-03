@@ -38,6 +38,9 @@ subcommands:
       This command creates a skeleton for a new app.
       It will create a directory for your app and write a skeleton
       spec file.
+    parameters:
+      - name: path
+        summary: Path to the distribution directory (default is 'Dist-Name' in current directory)
     options:
     - name: name
       summary: The (file) name of the app
