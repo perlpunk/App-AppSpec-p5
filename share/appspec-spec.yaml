@@ -6,6 +6,14 @@ markup: swim
 description: |
   This script is a collection of tools for authors of [App::Spec] command line
   scripts.
+    # generate completion
+    % appspec completion --bash path/to/spec.yaml
+    # generate pod
+    % appspec pod --bash path/to/spec.yaml
+    # validate your spec file
+    % appspec validate --bash path/to/spec.yaml
+    # generate a new App::Spec app skeleton
+    % appspec new --class App::foo --name foo --with-subcommands
 options: []
 
 subcommands:
@@ -73,7 +81,7 @@ subcommands:
     description: |
       This command takes a spec file and validates it against the current
       [App::Spec] schema.
-    op: validate
+    op: cmd_validate
     parameters:
     - *param_spec_file
     options:

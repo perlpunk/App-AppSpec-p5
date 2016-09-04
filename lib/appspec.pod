@@ -10,6 +10,15 @@ appspec - Utilities for spec files for App::Spec cli apps
 
 This script is a collection of tools for authors of L<App::Spec> command line scripts.
 
+    # generate completion
+    % appspec completion --bash path/to/spec.yaml
+    # generate pod
+    % appspec pod --bash path/to/spec.yaml
+    # validate your spec file
+    % appspec validate --bash path/to/spec.yaml
+    # generate a new App::Spec app skeleton
+    % appspec new --class App::foo --name foo --with-subcommands
+
 
 =head2 GLOBAL OPTIONS
 

@@ -11,7 +11,7 @@ our $VERSION = '0.000'; # VERSION
 
 use base 'App::Spec::Run';
 
-sub read_spec {
+sub _read_spec {
     my ($self) = @_;
     my $parameters = $self->parameters;
 
@@ -28,7 +28,7 @@ sub cmd_completion {
     my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
     die "Specify which shell" unless $shell;
 
-    my $spec = $self->read_spec;
+    my $spec = $self->_read_spec;
     my $completion = $spec->generate_completion(
         shell => $shell,
     );
@@ -39,23 +39,13 @@ sub generate_pod {
     my ($self) = @_;
     my $parameters = $self->parameters;
 
-    my $spec = $self->read_spec;
+    my $spec = $self->_read_spec;
     my $pod = $spec->generate_pod(
     );
     say $pod;
 }
 
-sub colorize {
-    my ($self) = @_;
-    # TODO
-    my $options = $self->options || {};
-    my $color = $options->{color};
-    my $env_color = $ENV{PERL5_APPSPEC_COLOR_OUTPUT} // 1;
-    return unless -t STDOUT;
-    return ($color || $env_color);
-}
-
-sub validate {
+sub cmd_validate {
     my ($self) = @_;
     my $options = $self->options;
     my $parameters = $self->parameters;
@@ -188,5 +178,31 @@ EOM
     print $fh $script;
     close $fh;
 }
+
+=pod
+
+=head1 NAME
+
+App::AppSpec - Utilities for App::Spec authors
+
+=head1 SYNOPSIS
+
+See L<appspec> documentation for the command line utility.
+
+=head1 DESCRIPTION
+
+This is the app class for the L<appspec> command line tool.
+It contains utilities for L<App::Spec> files, like generating
+completion or pod from it.
+
+=head1 METHODS
+
+=over 4
+
+=item cmd_completion, cmd_new, cmd_validate, generate_pod
+
+=back
+
+=cut
 
 1;
