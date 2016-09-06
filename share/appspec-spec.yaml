@@ -33,11 +33,10 @@ subcommands:
       description: for bash
       type: flag
     parameters:
-    - &param_spec_file
-      name: spec_file
-      type: file
-      required: true
-      summary: Path to the spec file (use '-' for standard input)
+    - &param_spec_file spec_file +file! --Path ...
+#      type: file
+#      required: true
+#      summary: Path to the spec file (use '-' for standard input)
 
   new:
     summary: Create new app
