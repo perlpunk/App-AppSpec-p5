@@ -76,6 +76,30 @@ sub cmd_validate {
     }
 }
 
+sub cmd_validate_stp {
+    my ($self) = @_;
+    my $options = $self->options;
+    my $parameters = $self->parameters;
+    my $color = $self->colorize;
+
+    my @errors;
+    require App::AppSpec::Schema::Validator;
+    my $validator = App::AppSpec::Schema::Validator->new;
+    my $spec_file = $parameters->{spec_file};
+    @errors = $validator->validate_spec_file_stp($spec_file);
+    binmode STDOUT, ":encoding(utf-8)";
+    if (@errors) {
+        $color and print color 'red';
+        say "Not valid!";
+        $color and print color 'reset';
+    }
+    else {
+        $color and print color 'bold green';
+        say "Validated ✓";
+        $color and print color 'reset';
+    }
+}
+
 sub cmd_new {
     my ($self) = @_;
     my $options = $self->options;

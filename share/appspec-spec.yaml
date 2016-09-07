@@ -89,4 +89,19 @@ subcommands:
       summary: output colorized
       type: flag
       aliases: [C]
+
+  validatestp:
+    summary: Validate spec file
+    description: |
+      This command takes a spec file and validates it against the current
+      [App::Spec] schema.
+    op: cmd_validate_stp
+    parameters:
+    - *param_spec_file
+    options:
+    - name: color
+      summary: output colorized
+      type: flag
+      aliases: [C]
+
 # vim:et:sts=2:sws=2:sw=2:foldmethod=indent

@@ -1,0 +1,45 @@
+-name: appspec
+-desc: Schema App-Apec YAML files
+-spec: schematype.org/v0.0.1
+-from: github:schematype/type/#master
+
+name: +str
+appspec:
+  version: +num
+title?: +str
+abstract?: +str
+description?: +str
+markup?: +str
+class?: +str
+options?: +option[+]
+parameters?: +option[+]
+subcommands?:
+  (+word): +command
+
++optionTypeSimple: . [flag, string, file]
++options: +option[+]
++option:
+  name: +str
+  summary?: +str
+  description?: +str
+  multiple?: +perl-bool
+  type?: +optionTypeSimple
+  enum?: +str[+]
+  aliases?: +str[+]
+  required?: +perl-bool
+  values?:
+    op: +str
+  completion?: +perl-bool
++command:
+  summary?: +str
+  description?: +str
+  op?: +str
+  options?: +option[+]
+  parameters?: +option[+]
+  subcommands?:
+    (+word): +command
++perl-bool: +int
+#  -pick:
+#    - +bool
+#    - +int [0, 1]
+#    - +str ['']

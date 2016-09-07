@@ -27,6 +27,22 @@ sub validate_spec {
     return @errors;
 }
 
+sub validate_spec_file_stp {
+    require IPC::Run;
+    import IPC::Run qw/ run timeout /;
+    my ($self, $spec_file) = @_;
+    my $schema_file = dist_file("App-AppSpec", "appspec.stp");
+    my @cmd = (qw/ stp validate -s /, $schema_file, $spec_file);
+    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@cmd], ['cmd']);
+    my $ok = run (\@cmd, \my $in, \my $out, \my $err, timeout(10));
+    my $rc = $?;
+    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$out], ['out']);
+    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$err], ['err']);
+    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$rc], ['rc']);
+    return $rc == 0 ? () : ($out);
+
+}
+
 sub format_errors {
     my ($self, $errors) = @_;
     my $output = '';
