@@ -2,6 +2,7 @@
 name: appspec
 appspec: { version: 0.001 }
 title: Utilities for spec files for App::Spec cli apps
+class: App::AppSpec
 markup: swim
 description: |
   This script is a collection of tools for authors of [App::Spec] command line

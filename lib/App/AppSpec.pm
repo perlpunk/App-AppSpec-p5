@@ -9,7 +9,7 @@ use File::Basename qw/ dirname /;
 
 our $VERSION = '0.000'; # VERSION
 
-use base 'App::Spec::Run';
+use base 'App::Spec::Run::Cmd';
 
 sub _read_spec {
     my ($self) = @_;
@@ -118,7 +118,7 @@ package $class;
 use strict;
 use warnings;
 use feature qw/ say /;
-use base 'App::Spec::Run';
+use base 'App::Spec::Run::Cmd';
 
 sub mycommand \{
     my (\$self) = \@_;
