@@ -12,8 +12,8 @@ our $VERSION = '0.000'; # VERSION
 use base 'App::Spec::Run::Cmd';
 
 sub _read_spec {
-    my ($self) = @_;
-    my $parameters = $self->parameters;
+    my ($self, $run) = @_;
+    my $parameters = $run->parameters;
 
     my $spec_file = $parameters->{spec_file};
     my $spec = App::Spec->read($spec_file);
@@ -21,14 +21,14 @@ sub _read_spec {
 }
 
 sub cmd_completion {
-    my ($self) = @_;
-    my $options = $self->options;
-    my $parameters = $self->parameters;
+    my ($self, $run) = @_;
+    my $options = $run->options;
+    my $parameters = $run->parameters;
 
     my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
     die "Specify which shell" unless $shell;
 
-    my $spec = $self->_read_spec;
+    my $spec = $self->_read_spec($run);
     my $completion = $spec->generate_completion(
         shell => $shell,
     );
@@ -36,19 +36,19 @@ sub cmd_completion {
 }
 
 sub generate_pod {
-    my ($self) = @_;
-    my $parameters = $self->parameters;
+    my ($self, $run) = @_;
+    my $parameters = $run->parameters;
 
-    my $spec = $self->_read_spec;
+    my $spec = $self->_read_spec($run);
     my $pod = $spec->generate_pod(
     );
     say $pod;
 }
 
 sub cmd_validate {
-    my ($self) = @_;
-    my $options = $self->options;
-    my $parameters = $self->parameters;
+    my ($self, $run) = @_;
+    my $options = $run->options;
+    my $parameters = $run->parameters;
     my $color = $self->colorize;
 
     my @errors;
@@ -77,9 +77,9 @@ sub cmd_validate {
 }
 
 sub cmd_new {
-    my ($self) = @_;
-    my $options = $self->options;
-    my $params = $self->parameters;
+    my ($self, $run) = @_;
+    my $options = $run->options;
+    my $params = $run->parameters;
     my $dist_path = $params->{path};
     require File::Path;
 
@@ -121,9 +121,9 @@ use feature qw/ say /;
 use base 'App::Spec::Run::Cmd';
 
 sub mycommand \{
-    my (\$self) = \@_;
-    my \$options = \$self->options;
-    my \$parameters = \$self->parameters;
+    my (\$self, \$run) = \@_;
+    my \$options = \$run->options;
+    my \$parameters = \$run->parameters;
 
     say "Hello world";
 \}
@@ -137,6 +137,7 @@ use warnings;
 
 use App::Spec;
 use App::AppSpec;
+use $class;
 use File::Share qw/ dist_file /;
 
 my \$specfile = dist_file("$dist", "$name-spec.yaml");
@@ -151,7 +152,7 @@ subcommands:
       summary: "Summary for mycommand"
       op: "mycommand"
       description: "Description for mycommand"
-    parameters:
+      parameters:
       - name: "myparam"
         summary: "Summary for myparam"
         required: 1
