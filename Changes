@@ -1,4 +1,7 @@
 Revision history for Perl module App::AppSpec
 
+0.002 Thu Oct 13 21:23:38 CEST 2016
+    - Adapt to App::Spec 0.003 changes
+
 0.001_001 Sun Sep  4 22:12:24 CEST 2016
     - developer version
