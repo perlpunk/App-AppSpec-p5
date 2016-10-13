@@ -10,9 +10,9 @@ description: |
     # generate completion
     % appspec completion --bash path/to/spec.yaml
     # generate pod
-    % appspec pod --bash path/to/spec.yaml
+    % appspec pod path/to/spec.yaml
     # validate your spec file
-    % appspec validate --bash path/to/spec.yaml
+    % appspec validate path/to/spec.yaml
     # generate a new App::Spec app skeleton
     % appspec new --class App::foo --name foo --with-subcommands
 options: []
@@ -26,7 +26,7 @@ subcommands:
     op: cmd_completion
     options:
     - name: name
-      description: name of the program
+      description: name of the program (optional, override the value from the spec)
     - name: zsh
       description: for zsh
       type: flag
