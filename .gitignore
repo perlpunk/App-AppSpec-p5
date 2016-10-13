@@ -1,2 +1,6 @@
 *.swp
 App-AppSpec-*
+dev
+cover_db
+local
+pod2htmd.tmp
