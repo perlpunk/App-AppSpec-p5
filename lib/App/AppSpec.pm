@@ -204,6 +204,11 @@ completion or pod from it.
 
 =back
 
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.
+
 =cut
 
 1;
