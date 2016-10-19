@@ -19,10 +19,9 @@ sub validate_spec {
     my ($self, $spec) = @_;
     eval { require JSON::Validator }
         or die "JSON::Validator is needed for validating a spec file";
-    my $file = dist_file("App-Spec", "schema.yaml");
-    my $schema = YAML::XS::LoadFile($file);
+    my $schema_file = dist_file("App-Spec", "schema.yaml");
     my $json_validator = JSON::Validator->new;
-    $json_validator->schema($schema);
+    $json_validator->schema($schema_file);
     my @errors = $json_validator->validate($spec);
     return @errors;
 }
