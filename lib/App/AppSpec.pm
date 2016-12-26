@@ -40,8 +40,13 @@ sub generate_pod {
     my $parameters = $run->parameters;
 
     my $spec = $self->_read_spec($run);
-    my $pod = $spec->generate_pod(
+
+    require App::Spec::Pod;
+    my $generator = App::Spec::Pod->new(
+        spec => $spec,
     );
+    my $pod = $generator->generate;
+
     say $pod;
 }
 
