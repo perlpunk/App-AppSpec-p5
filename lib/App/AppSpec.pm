@@ -109,9 +109,10 @@ class: $class
 title: 'app title'
 description: 'app description'
 options:
-- name: "some-option"
-  type: "flag"
-  summary: "option summary"
+- name: some-flag
+  type: flag
+  summary: option summary
+- spec: other-option=s --another option
 EOM
     my $module = <<"EOM";
 package $class;
