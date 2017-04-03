@@ -172,7 +172,7 @@ EOM
     File::Path::make_path("$dist/bin");
     File::Path::make_path(dirname $module_path);
     my $specfile = "$dist/share/$name-spec.yaml";
-    say "Writig spec to $specfile";
+    say "Writing spec to $specfile";
     open my $fh, ">", $specfile or die $!;
     print $fh $spec;
     close $fh;
