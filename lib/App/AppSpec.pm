@@ -126,7 +126,7 @@ use warnings;
 use feature qw/ say /;
 use base 'App::Spec::Run::Cmd';
 
-sub mycommand \{
+sub execute \{
     my (\$self, \$run) = \@_;
     my \$options = \$run->options;
     my \$parameters = \$run->parameters;
