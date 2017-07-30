@@ -119,6 +119,7 @@ options:
   summary: option summary
 - spec: other-option=s --another option
 EOM
+    my $subname = $options->{"with-subcommands"} ? "mycommand" : "execute";
     my $module = <<"EOM";
 package $class;
 use strict;
@@ -126,7 +127,7 @@ use warnings;
 use feature qw/ say /;
 use base 'App::Spec::Run::Cmd';
 
-sub execute \{
+sub $subname \{
     my (\$self, \$run) = \@_;
     my \$options = \$run->options;
     my \$parameters = \$run->parameters;
