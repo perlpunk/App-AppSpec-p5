@@ -59,10 +59,10 @@ This command creates a skeleton for a new app. It will create a directory for yo
 
 Options:
 
-    --name -n              *  The (file) name of the app                     
-    --class -c             *  The main class name for your app implementation
-    --overwrite -o            Overwrite existing dist directory (flag)       
-    --with-subcommands -s     Create an app with subcommands (flag)          
+    --name -n                The (file) name of the app                     
+    --class -c               The main class name for your app implementation
+    --overwrite -o           Overwrite existing dist directory (flag)       
+    --with-subcommands -s    Create an app with subcommands (flag)          
 
 Parameters:
 
