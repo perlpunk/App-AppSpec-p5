@@ -41,7 +41,7 @@ subcommands:
       It will create a directory for your app and write a skeleton
       spec file.
     parameters:
-      - spec: path --Path to the distribution directory (default is 'Dist-Name' in current directory)
+      - spec: path=s --Path to the distribution directory (default is 'Dist-Name' in current directory)
     options:
     - spec: name|n=s --The (file) name of the app
       required: true
