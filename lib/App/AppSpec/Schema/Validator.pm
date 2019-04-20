@@ -11,7 +11,8 @@ use Moo;
 
 sub validate_spec_file {
     my ($self, $file) = @_;
-    my $spec = YAML::PP::LoadFile($file);
+    my $yp = YAML::PP->new( boolean => 'JSON::PP', schema => [qw/ JSON /] );
+    my $spec = $yp->load_file($file);
     return $self->validate_spec($spec);
 }
 
@@ -21,7 +22,9 @@ sub validate_spec {
         or die "JSON::Validator is needed for validating a spec file";
     my $schema_file = dist_file("App-Spec", "schema.yaml");
     my $json_validator = JSON::Validator->new;
-    $json_validator->schema($schema_file);
+    my $yp = YAML::PP->new( boolean => 'JSON::PP', schema => [qw/ JSON /] );
+    my $schema = $yp->load_file($schema_file);
+    $json_validator->schema($schema);
     my @errors = $json_validator->validate($spec);
     return @errors;
 }
