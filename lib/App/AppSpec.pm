@@ -54,7 +54,6 @@ sub cmd_validate {
     my ($self, $run) = @_;
     my $options = $run->options;
     my $parameters = $run->parameters;
-    my $color = $self->colorize;
 
     my @errors;
     require App::AppSpec::Schema::Validator;
@@ -70,14 +69,10 @@ sub cmd_validate {
     binmode STDOUT, ":encoding(utf-8)";
     if (@errors) {
         print $validator->format_errors(\@errors);
-        $color and print color 'red';
-        say "Not valid!";
-        $color and print color 'reset';
+        say $run->colored(out => red => "Not valid!");
     }
     else {
-        $color and print color 'bold green';
-        say "Validated ✓";
-        $color and print color 'reset';
+        say $run->colored(out => [qw/ bold green /] => "Validated ✓");
     }
 }
 
