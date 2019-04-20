@@ -5,6 +5,7 @@ use 5.010;
 use utf8;
 package App::AppSpec;
 use Term::ANSIColor;
+use YAML::PP;
 use File::Basename qw/ dirname /;
 
 our $VERSION = '0.000'; # VERSION
@@ -60,7 +61,7 @@ sub cmd_validate {
     my $validator = App::AppSpec::Schema::Validator->new;
     my $spec_file = $parameters->{spec_file};
     if (ref $spec_file eq 'SCALAR') {
-        my $spec = YAML::XS::Load($$spec_file);
+        my $spec = YAML::PP::Load($$spec_file);
         @errors = $validator->validate_spec($spec);
     }
     else {

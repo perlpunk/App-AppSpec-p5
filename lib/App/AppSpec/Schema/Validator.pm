@@ -6,12 +6,12 @@ our $VERSION = '0.000'; # VERSION
 
 use App::Spec;
 use File::Share qw/ dist_file /;
-use YAML::XS;
+use YAML::PP;
 use Moo;
 
 sub validate_spec_file {
     my ($self, $file) = @_;
-    my $spec = YAML::XS::LoadFile($file);
+    my $spec = YAML::PP::LoadFile($file);
     return $self->validate_spec($spec);
 }
 
