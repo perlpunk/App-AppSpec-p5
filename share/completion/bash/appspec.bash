@@ -30,8 +30,6 @@ _appspec() {
     # subcmds
     case ${MYWORDS[0]} in
       _meta)
-        FLAGS+=()
-        OPTIONS+=()
         __appspec_handle_options_flags
         case $INDEX in
 
@@ -44,8 +42,6 @@ _appspec() {
         # subcmds
         case ${MYWORDS[1]} in
           completion)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             case $INDEX in
 
@@ -61,15 +57,16 @@ _appspec() {
                 FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
                 OPTIONS+=('--name' 'name of the program (optional, override name in spec)')
                 __appspec_handle_options_flags
-                  case $INDEX in
-                  *)
-                    __comp_current_options true || return # after parameters
-                    case ${MYWORDS[$INDEX-1]} in
-                      --name)
-                      ;;
+                case ${MYWORDS[$INDEX-1]} in
+                  --name)
+                  ;;
 
-                    esac
-                    ;;
+                esac
+                case $INDEX in
+
+                *)
+                    __comp_current_options || return
+                ;;
                 esac
               ;;
             esac
@@ -78,8 +75,6 @@ _appspec() {
             esac
           ;;
           pod)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             case $INDEX in
 
@@ -92,8 +87,6 @@ _appspec() {
             # subcmds
             case ${MYWORDS[2]} in
               generate)
-                FLAGS+=()
-                OPTIONS+=()
                 __appspec_handle_options_flags
                 __comp_current_options true || return # no subcmds, no params/opts
               ;;
@@ -111,23 +104,24 @@ _appspec() {
         FLAGS+=('--zsh' 'for zsh' '--bash' 'for bash')
         OPTIONS+=('--name' 'name of the program (optional, override the value from the spec)')
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --name)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --name)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       help)
         FLAGS+=('--all' '')
-        OPTIONS+=()
         __appspec_handle_options_flags
         case $INDEX in
 
@@ -140,8 +134,6 @@ _appspec() {
         # subcmds
         case ${MYWORDS[1]} in
           _meta)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             case $INDEX in
 
@@ -154,8 +146,6 @@ _appspec() {
             # subcmds
             case ${MYWORDS[2]} in
               completion)
-                FLAGS+=()
-                OPTIONS+=()
                 __appspec_handle_options_flags
                 case $INDEX in
 
@@ -168,8 +158,6 @@ _appspec() {
                 # subcmds
                 case ${MYWORDS[3]} in
                   generate)
-                    FLAGS+=()
-                    OPTIONS+=()
                     __appspec_handle_options_flags
                     __comp_current_options true || return # no subcmds, no params/opts
                   ;;
@@ -179,8 +167,6 @@ _appspec() {
                 esac
               ;;
               pod)
-                FLAGS+=()
-                OPTIONS+=()
                 __appspec_handle_options_flags
                 case $INDEX in
 
@@ -193,8 +179,6 @@ _appspec() {
                 # subcmds
                 case ${MYWORDS[3]} in
                   generate)
-                    FLAGS+=()
-                    OPTIONS+=()
                     __appspec_handle_options_flags
                     __comp_current_options true || return # no subcmds, no params/opts
                   ;;
@@ -209,26 +193,18 @@ _appspec() {
             esac
           ;;
           completion)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           new)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           pod)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
           validate)
-            FLAGS+=()
-            OPTIONS+=()
             __appspec_handle_options_flags
             __comp_current_options true || return # no subcmds, no params/opts
           ;;
@@ -241,52 +217,55 @@ _appspec() {
         FLAGS+=('--overwrite' 'Overwrite existing dist directory' '-o' 'Overwrite existing dist directory' '--with-subcommands' 'Create an app with subcommands' '-s' 'Create an app with subcommands')
         OPTIONS+=('--name' 'The (file) name of the app' '-n' 'The (file) name of the app' '--class' 'The main class name for your app implementation' '-c' 'The main class name for your app implementation')
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+          --name|-n)
+          ;;
+          --class|-c)
+          ;;
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
-              --name|-n)
-              ;;
-              --class|-c)
-              ;;
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       pod)
-        FLAGS+=()
-        OPTIONS+=()
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
       validate)
         FLAGS+=('--color' 'output colorized' '-C' 'output colorized')
-        OPTIONS+=()
         __appspec_handle_options_flags
-          case $INDEX in
+        case ${MYWORDS[$INDEX-1]} in
+
+        esac
+        case $INDEX in
           1)
               __comp_current_options || return
           ;;
-          *)
-            __comp_current_options true || return # after parameters
-            case ${MYWORDS[$INDEX-1]} in
 
-            esac
-            ;;
+
+        *)
+            __comp_current_options || return
+        ;;
         esac
       ;;
     esac
