@@ -15,8 +15,9 @@ $SPEC = {
     'version' => '0.001'
   },
   'class' => 'App::AppSpec',
-  'description' => 'This script is a collection of tools for authors of [App::Spec] command line
+  'description' => 'This script is a collection of tools for authors of L<App::Spec> command line
 scripts.
+
   # generate completion
   % appspec completion --bash path/to/spec.yaml
   # generate pod
@@ -26,7 +27,7 @@ scripts.
   # generate a new App::Spec app skeleton
   % appspec new --class App::foo --name foo --with-subcommands
 ',
-  'markup' => 'swim',
+  'markup' => 'pod',
   'name' => 'appspec',
   'options' => [],
   'subcommands' => {
@@ -36,21 +37,12 @@ shell script for tab completion.
 ',
       'op' => 'cmd_completion',
       'options' => [
-        {
-          'spec' => 'name=s --name of the program (optional, override the value from the spec)'
-        },
-        {
-          'spec' => 'zsh --for zsh'
-        },
-        {
-          'spec' => 'bash --for bash'
-        }
+        'name=s --name of the program (optional, override the value from the spec)',
+        'zsh --for zsh',
+        'bash --for bash'
       ],
       'parameters' => [
-        {
-          'description' => 'spec file',
-          'spec' => '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
-        }
+        '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
       ],
       'summary' => 'Generate completion for a specified spec file'
     },
@@ -58,28 +50,20 @@ shell script for tab completion.
       'description' => 'This command creates a skeleton for a new app.
 It will create a directory for your app and write a skeleton
 spec file.
+
+Example:
+
+  appspec new --name myprogram --class App::MyProgram App-MyProgram
 ',
       'op' => 'cmd_new',
       'options' => [
-        {
-          'required' => 1,
-          'spec' => 'name|n=s --The (file) name of the app'
-        },
-        {
-          'required' => 1,
-          'spec' => 'class|c=s --The main class name for your app implementation'
-        },
-        {
-          'spec' => 'overwrite|o --Overwrite existing dist directory'
-        },
-        {
-          'spec' => 'with-subcommands|s --Create an app with subcommands'
-        }
+        '+name|n=s --The (file) name of the app',
+        '+class|c=s --The main class name for your app implementation',
+        'overwrite|o --Overwrite existing dist directory',
+        'with-subcommands|s --Create an app with subcommands'
       ],
       'parameters' => [
-        {
-          'spec' => 'path=s --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
-        }
+        'path=s --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
       ],
       'summary' => 'Create new app'
     },
@@ -89,22 +73,20 @@ documentation.
 ',
       'op' => 'generate_pod',
       'parameters' => [
-        $SPEC->{'subcommands'}{'completion'}{'parameters'}[0]
+        '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
       ],
       'summary' => 'Generate pod'
     },
     'validate' => {
       'description' => 'This command takes a spec file and validates it against the current
-[App::Spec] schema.
+L<App::Spec> schema.
 ',
       'op' => 'cmd_validate',
       'options' => [
-        {
-          'spec' => 'color|C --output colorized'
-        }
+        'color|C --output colorized'
       ],
       'parameters' => [
-        $SPEC->{'subcommands'}{'completion'}{'parameters'}[0]
+        '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
       ],
       'summary' => 'Validate spec file'
     }
