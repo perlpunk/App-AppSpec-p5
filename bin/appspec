@@ -33,11 +33,15 @@ $fatpacked{"App/AppSpec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP
       my ($self, $run) = @_;
       my $options = $run->options;
       my $parameters = $run->parameters;
+      my $name = $options->{name};
   
       my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
       die "Specify which shell" unless $shell;
   
       my $spec = $self->_read_spec($run);
+      if (defined $name) {
+          $spec->name($name);
+      }
       my $completion = $spec->generate_completion(
           shell => $shell,
       );
