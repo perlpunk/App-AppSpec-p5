@@ -85,3 +85,25 @@ There you will find `bin/appspec`.
 
 It currently requires perl 5.20 or higher, otherwise you will get an
 error message.
+
+## Completion
+
+You can find the shell completion files in the `share/completion` directory.
+
+Then you can complete like this:
+
+    appspec <TAB>
+    appspec completion -<TAB>
+    appspec completion --zsh file.yaml
+
+### bash
+
+    $ source share/completion/bash/appspec.bash
+
+### zsh
+
+Add `path/to/share/completion/zsh` to your .zshrc before the compinit call:
+
+    fpath=('path/to/App-AppSpec-p5/share/completion/zsh' $fpath)
+
+and `exec zsh`.
