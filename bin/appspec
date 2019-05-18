@@ -288,8 +288,9 @@ $fatpacked{"App/AppSpec/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
       'version' => '0.001'
     },
     'class' => 'App::AppSpec',
-    'description' => 'This script is a collection of tools for authors of [App::Spec] command line
+    'description' => 'This script is a collection of tools for authors of L<App::Spec> command line
   scripts.
+  
     # generate completion
     % appspec completion --bash path/to/spec.yaml
     # generate pod
@@ -299,7 +300,7 @@ $fatpacked{"App/AppSpec/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
     # generate a new App::Spec app skeleton
     % appspec new --class App::foo --name foo --with-subcommands
   ',
-    'markup' => 'swim',
+    'markup' => 'pod',
     'name' => 'appspec',
     'options' => [],
     'subcommands' => {
@@ -309,21 +310,12 @@ $fatpacked{"App/AppSpec/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   ',
         'op' => 'cmd_completion',
         'options' => [
-          {
-            'spec' => 'name=s --name of the program (optional, override the value from the spec)'
-          },
-          {
-            'spec' => 'zsh --for zsh'
-          },
-          {
-            'spec' => 'bash --for bash'
-          }
+          'name=s --name of the program (optional, override the value from the spec)',
+          'zsh --for zsh',
+          'bash --for bash'
         ],
         'parameters' => [
-          {
-            'description' => 'spec file',
-            'spec' => '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
-          }
+          '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
         ],
         'summary' => 'Generate completion for a specified spec file'
       },
@@ -331,28 +323,20 @@ $fatpacked{"App/AppSpec/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
         'description' => 'This command creates a skeleton for a new app.
   It will create a directory for your app and write a skeleton
   spec file.
+  
+  Example:
+  
+    appspec new --name myprogram --class App::MyProgram App-MyProgram
   ',
         'op' => 'cmd_new',
         'options' => [
-          {
-            'required' => 1,
-            'spec' => 'name|n=s --The (file) name of the app'
-          },
-          {
-            'required' => 1,
-            'spec' => 'class|c=s --The main class name for your app implementation'
-          },
-          {
-            'spec' => 'overwrite|o --Overwrite existing dist directory'
-          },
-          {
-            'spec' => 'with-subcommands|s --Create an app with subcommands'
-          }
+          '+name|n=s --The (file) name of the app',
+          '+class|c=s --The main class name for your app implementation',
+          'overwrite|o --Overwrite existing dist directory',
+          'with-subcommands|s --Create an app with subcommands'
         ],
         'parameters' => [
-          {
-            'spec' => 'path=s --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
-          }
+          'path=s --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
         ],
         'summary' => 'Create new app'
       },
@@ -362,22 +346,20 @@ $fatpacked{"App/AppSpec/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   ',
         'op' => 'generate_pod',
         'parameters' => [
-          $SPEC->{'subcommands'}{'completion'}{'parameters'}[0]
+          '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
         ],
         'summary' => 'Generate pod'
       },
       'validate' => {
         'description' => 'This command takes a spec file and validates it against the current
-  [App::Spec] schema.
+  L<App::Spec> schema.
   ',
         'op' => 'cmd_validate',
         'options' => [
-          {
-            'spec' => 'color|C --output colorized'
-          }
+          'color|C --output colorized'
         ],
         'parameters' => [
-          $SPEC->{'subcommands'}{'completion'}{'parameters'}[0]
+          '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
         ],
         'summary' => 'Validate spec file'
       }
@@ -396,7 +378,7 @@ $fatpacked{"App/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SP
   package App::Spec;
   use 5.010;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use App::Spec::Subcommand;
   use App::Spec::Option;
@@ -821,7 +803,7 @@ $fatpacked{"App/Spec/Argument.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package App::Spec::Argument;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   
@@ -1089,7 +1071,7 @@ $fatpacked{"App/Spec/Completion.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Completion;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   
@@ -1126,7 +1108,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use warnings;
   package App::Spec::Completion::Bash;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -1813,7 +1795,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use warnings;
   package App::Spec::Completion::Zsh;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -2281,7 +2263,7 @@ $fatpacked{"App/Spec/Option.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package App::Spec::Option;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2337,7 +2319,7 @@ $fatpacked{"App/Spec/Parameter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use warnings;
   package App::Spec::Parameter;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2415,7 +2397,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   package App::Spec::Plugin::Format;
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use YAML::PP;
   use Ref::Util qw/ is_arrayref /;
@@ -2537,7 +2519,7 @@ $fatpacked{"App/Spec/Plugin/Help.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Help;
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   with 'App::Spec::Role::Plugin::Subcommand';
@@ -2713,7 +2695,7 @@ $fatpacked{"App/Spec/Plugin/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Meta;
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use List::Util qw/ any /;
   
@@ -2834,7 +2816,7 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Pod;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Text::Table;
   
@@ -3120,7 +3102,7 @@ $fatpacked{"App/Spec/Role/Command.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Role::Command;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use YAML::PP;
   use List::Util qw/ any /;
@@ -3357,7 +3339,7 @@ $fatpacked{"App/Spec/Role/Plugin.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use warnings;
   package App::Spec::Role::Plugin;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo::Role;
   
@@ -3400,7 +3382,7 @@ $fatpacked{"App/Spec/Role/Plugin/GlobalOptions.pm"} = '#line '.(1+__LINE__).' "'
   use warnings;
   package App::Spec::Role::Plugin::GlobalOptions;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo::Role;
   
@@ -3449,7 +3431,7 @@ $fatpacked{"App/Spec/Role/Plugin/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__
   use warnings;
   package App::Spec::Role::Plugin::Subcommand;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo::Role;
   
@@ -3489,7 +3471,7 @@ $fatpacked{"App/Spec/Run.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Run;
   use 5.010;
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use App::Spec::Run::Validator;
   use App::Spec::Run::Response;
@@ -4173,7 +4155,7 @@ $fatpacked{"App/Spec/Run/Cmd.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   package App::Spec::Run::Cmd;
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use App::Spec::Run;
   use Moo;
@@ -4197,7 +4179,7 @@ $fatpacked{"App/Spec/Run/Output.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Run::Output;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use Moo;
   
@@ -4242,7 +4224,7 @@ $fatpacked{"App/Spec/Run/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Run::Response;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use App::Spec::Run::Output;
   use Scalar::Util qw/ blessed /;
@@ -4428,7 +4410,7 @@ $fatpacked{"App/Spec/Run/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use warnings;
   package App::Spec::Run::Validator;
   
-  our $VERSION = '0.007'; # VERSION;
+  our $VERSION = '0.008'; # VERSION;
   
   use List::Util qw/ any /;
   use List::MoreUtils qw/ uniq /;
@@ -4705,7 +4687,7 @@ $fatpacked{"App/Spec/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Subcommand;
   
-  our $VERSION = '0.007'; # VERSION
+  our $VERSION = '0.008'; # VERSION
   
   use App::Spec::Option;
   use App::Spec::Parameter;
