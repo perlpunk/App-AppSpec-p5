@@ -60,15 +60,28 @@ you can find an example of how to call an external command:
 
 ## Installation
 
-This is a perl tool. In order to use it, you need to install the CPAN
-module App::AppSpec (which itself requires App::Spec).
-
-This can be done with the `cpan` or `cpanm` command:
-
-    cpan App::AppSpec
-    cpanm App::AppSpec
+This is a perl tool. In order to use it, you either need to install it from
+CPAN, or try the standalone version.
 
 It should work for any perl version 5.10 or higher.
 
-I will try to generate a self containing perl executable in the future.
+### CPAN installation
 
+You need to install the CPAN module App::AppSpec.
+
+This can be done with the `cpan` or `cpanm` command:
+
+    % cpanm App::AppSpec
+    # or
+    % cpan App::AppSpec
+
+The `cpanm` command might be easier since it doesn't require configuration.
+You need to install `cpanminus` for that (e.g. `apt-get install cpanminus`).
+
+## Standalone version
+
+For a standalone version of the script, checkout the `standalone` branch.
+There you will find `bin/appspec`.
+
+It currently requires perl 5.20 or higher, otherwise you will get an
+error message.

@@ -4,3 +4,4 @@ dev
 cover_db
 local
 pod2htmd.tmp
+standalone
