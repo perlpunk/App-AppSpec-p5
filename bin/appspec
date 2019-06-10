@@ -382,7 +382,7 @@ $fatpacked{"App/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SP
   package App::Spec;
   use 5.010;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use App::Spec::Subcommand;
   use App::Spec::Option;
@@ -807,7 +807,7 @@ $fatpacked{"App/Spec/Argument.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package App::Spec::Argument;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   
@@ -1075,7 +1075,7 @@ $fatpacked{"App/Spec/Completion.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Completion;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   
@@ -1112,7 +1112,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use warnings;
   package App::Spec::Completion::Bash;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -1122,6 +1122,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
       my $spec = $self->spec;
       my $appname = $spec->name;
   
+      my $appspec_version = App::Spec->VERSION;
   
       my $functions = [];
       my $completion_outer = $self->completion_commands(
@@ -1137,18 +1138,20 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
       my $body = <<"EOM";
   #!bash
   
+  # Generated with perl module App::Spec v$appspec_version
+  
   _$appname() \{
   
       COMPREPLY=()
       local program=$appname
-      local cur=\$\{COMP_WORDS[\$COMP_CWORD]\}
-  #    echo "COMP_CWORD:\$COMP_CWORD cur:\$cur" >>/tmp/comp
+      local cur prev words cword
+      _init_completion -n : || return
       declare -a FLAGS
       declare -a OPTIONS
       declare -a MYWORDS
   
-      local INDEX=`expr \$COMP_CWORD - 1`
-      MYWORDS=("\$\{COMP_WORDS[@]:1:\$COMP_CWORD\}")
+      local INDEX=`expr \$cword - 1`
+      MYWORDS=("\$\{words[@]:1:\$cword\}")
   
       FLAGS=($flags_string)
       OPTIONS=($options_string)
@@ -1158,12 +1161,15 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   \}
   
   _${appname}_compreply() \{
-      IFS=\$'\\n' COMPREPLY=(\$(compgen -W "\$1" -- \$\{COMP_WORDS\[COMP_CWORD\]\}))
+      local prefix=""
+      cur="\$(printf '%q' "\$cur")"
+      IFS=\$'\\n' COMPREPLY=(\$(compgen -P "\$prefix" -W "\$*" -- "\$cur"))
+      __ltrim_colon_completions "\$prefix\$cur"
   
       # http://stackoverflow.com/questions/7267185/bash-autocompletion-add-description-for-possible-completions
       if [[ \$\{#COMPREPLY[*]\} -eq 1 ]]; then # Only one completion
-          COMPREPLY=( \$\{COMPREPLY[0]%% -- *\} ) # Remove ' -- ' and everything after
-          COMPREPLY=( \$\{COMPREPLY[0]%% *\} ) # Remove trailing spaces
+          COMPREPLY=( "\$\{COMPREPLY[0]%% -- *\}" ) # Remove ' -- ' and everything after
+          COMPREPLY=( "\$\{COMPREPLY[0]%%+( )\}" ) # Remove trailing spaces
       fi
   \}
   
@@ -1419,15 +1425,16 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   ${indent}  @{[ join '|', @option_strings ]})
   EOM
           if ($enum) {
-              my @list = map { s/ /\\ /g; $_ } @$enum;
-              local $" = q{"$'\\n'"};
+              my @list = @$enum;
               for (@list) {
                   s/['`]/'"'"'/g;
+                  s/\\/\\\\/g;
+                  s/ /\\\\\\\\ /g;
                   s/\$/\\\$/g;
-                  $_ = "'$_'";
+                  $_ = qq{"$_"};
               }
               $comp_value .= <<"EOM";
-  ${indent}    _${appname}_compreply "@list"
+  ${indent}    _${appname}_compreply @list
   ${indent}    return
   EOM
           }
@@ -1488,7 +1495,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
           $function = <<"EOM";
   $function_name() \{
       local __dynamic_completion
-      __dynamic_completion=`PERL5_APPSPECRUN_SHELL=bash PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' \${COMP_WORDS[@]}`
+      __dynamic_completion=\$(PERL5_APPSPECRUN_SHELL=bash PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' \${words[@]})
       __${appname}_dynamic_comp '$name' "\$__dynamic_completion"
   \}
   EOM
@@ -1509,7 +1516,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
                           my @repl = @$replace;
                           if ($replace->[0] eq 'SHELL_WORDS') {
                               my $num = $replace->[1];
-                              my $index = "\$COMP_CWORD";
+                              my $index = "\$cword";
                               if ($num ne 'CURRENT') {
                                   if ($num =~ m/^-/) {
                                       $index .= $num;
@@ -1518,7 +1525,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
                                       $index = $num - 1;
                                   }
                               }
-                              my $string = qq{"\$\{COMP_WORDS\[$index\]\}"};
+                              my $string = qq{"\$\{words\[$index\]\}"};
                               push @args, $string;
                           }
                       }
@@ -1539,7 +1546,8 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
           chomp $string;
           $function = <<"EOM";
   $function_name() \{
-      local param_$shell_name=`$string`
+      local CURRENT_WORD="\${words\[\$cword\]\}"
+      local param_$shell_name="\$($string)"
       _${appname}_compreply "\$param_$shell_name"
   \}
   EOM
@@ -1592,13 +1600,15 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
       my $enum = $param->enum;
       if ($enum) {
           my @list = @$enum;
-          local $" = q{"$'\\n'"};
           for (@list) {
               s/['`]/'"'"'/g;
+              s/\\/\\\\/g;
+              s/ /\\\\ /g;
               s/\$/\\\$/g;
+              $_ = qq{"$_"};
           }
           $comp = <<"EOM";
-  ${indent}    _${appname}_compreply "@list"
+  ${indent}    _${appname}_compreply @list
   EOM
       }
       elsif ($type eq "file" or $type eq "dir") {
@@ -1623,7 +1633,8 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   __APPNAME_dynamic_comp() {
       local argname="$1"
       local arg="$2"
-      local comp name desc cols desclength formatted
+      local name desc cols desclength formatted
+      local comp=()
       local max=0
   
       while read -r line; do
@@ -1646,12 +1657,12 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
               [[ -z $cols ]] && cols=80
               desclength=`expr $cols - 4 - $max`
               formatted=`printf "%-*s -- %-*s" "$max" "$name" "$desclength" "$desc"`
-              comp="$comp$formatted"$'\n'
+              comp+=("$formatted")
           else
-              comp="$comp'$name'"$'\n'
+              comp+=("'$name'")
           fi
       done <<< "$arg"
-      _APPNAME_compreply "$comp"
+      _APPNAME_compreply ${comp[@]}
   }
   
   function __APPNAME_handle_options() {
@@ -1799,7 +1810,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use warnings;
   package App::Spec::Completion::Zsh;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -1809,6 +1820,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
       my $spec = $self->spec;
       my $appname = $spec->name;
       my $functions = [];
+      my $appspec_version = App::Spec->VERSION;
       my $completion_outer = $self->completion_commands(
           commands => $spec->subcommands,
           options => $spec->options,
@@ -1820,6 +1832,8 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   
   my $body = <<"EOM";
   #compdef $appname
+  
+  # Generated with perl module App::Spec v$appspec_version
   
   _$appname() {
       local program=$appname
@@ -2061,8 +2075,8 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
           $function = <<"EOM";
   $function_name() \{
       local __dynamic_completion
-      __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' "\${words[@]}"`
-      __${appname}_dynamic_comp '$name' "\$__dynamic_completion"
+      __dynamic_completion=\$(PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='$name' "\${words[@]}")
+      __${appname}_dynamic_comp '$name' \$__dynamic_completion
   \}
   EOM
       }
@@ -2111,7 +2125,8 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
           $function = <<"EOM";
   $function_name() \{
       local __dynamic_completion
-      IFS=\$'\\n' set -A __dynamic_completion `$string`
+      local CURRENT_WORD="\$words\[CURRENT\]"
+      IFS=\$'\\n' set -A __dynamic_completion \$( $string )
       compadd -X "$shell_name:" \$__dynamic_completion
   \}
   EOM
@@ -2192,7 +2207,11 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
               $comp .= $indent . ";;\n";
           }
           elsif ($enum) {
-              my @list = map { qq{"$_"} } @$enum;
+              my @list = map {
+                  my $item = $_;
+                  $item =~ s/:/\\:/g;
+                  qq{"$item"};
+              } @$enum;
               $values = ":$name:(@list)";
           }
           elsif ($type eq "file" or $type eq "dir") {
@@ -2267,7 +2286,7 @@ $fatpacked{"App/Spec/Option.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package App::Spec::Option;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2323,7 +2342,7 @@ $fatpacked{"App/Spec/Parameter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use warnings;
   package App::Spec::Parameter;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2401,7 +2420,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   package App::Spec::Plugin::Format;
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use YAML::PP;
   use Ref::Util qw/ is_arrayref /;
@@ -2462,7 +2481,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
               $tb->load(@$content);
               $content = encode_utf8 "$tb";
           }
-          elsif ($format eq 'Data__Dump') {
+          elsif ($format eq 'Data::Dump') {
               require Data::Dump;
               $content = Data::Dump::dump($content) . "\n";
           }
@@ -2514,7 +2533,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   -   name: format
       summary: Format output
       type: string
-      enum: [JSON, YAML, Table, "Data__Dumper", "Data__Dump"]
+      enum: [JSON, YAML, Table, "Data::Dumper", "Data::Dump"]
   
 APP_SPEC_PLUGIN_FORMAT
 
@@ -2523,7 +2542,7 @@ $fatpacked{"App/Spec/Plugin/Help.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Help;
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   with 'App::Spec::Role::Plugin::Subcommand';
@@ -2699,7 +2718,7 @@ $fatpacked{"App/Spec/Plugin/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Meta;
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use List::Util qw/ any /;
   
@@ -2820,7 +2839,7 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Pod;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Text::Table;
   
@@ -3106,7 +3125,7 @@ $fatpacked{"App/Spec/Role/Command.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Role::Command;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use YAML::PP;
   use List::Util qw/ any /;
@@ -3343,7 +3362,7 @@ $fatpacked{"App/Spec/Role/Plugin.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use warnings;
   package App::Spec::Role::Plugin;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo::Role;
   
@@ -3386,7 +3405,7 @@ $fatpacked{"App/Spec/Role/Plugin/GlobalOptions.pm"} = '#line '.(1+__LINE__).' "'
   use warnings;
   package App::Spec::Role::Plugin::GlobalOptions;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo::Role;
   
@@ -3435,7 +3454,7 @@ $fatpacked{"App/Spec/Role/Plugin/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__
   use warnings;
   package App::Spec::Role::Plugin::Subcommand;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo::Role;
   
@@ -3475,7 +3494,7 @@ $fatpacked{"App/Spec/Run.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Run;
   use 5.010;
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use App::Spec::Run::Validator;
   use App::Spec::Run::Response;
@@ -4159,7 +4178,7 @@ $fatpacked{"App/Spec/Run/Cmd.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   package App::Spec::Run::Cmd;
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use App::Spec::Run;
   use Moo;
@@ -4183,7 +4202,7 @@ $fatpacked{"App/Spec/Run/Output.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Run::Output;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use Moo;
   
@@ -4228,7 +4247,7 @@ $fatpacked{"App/Spec/Run/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Run::Response;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use App::Spec::Run::Output;
   use Scalar::Util qw/ blessed /;
@@ -4414,7 +4433,7 @@ $fatpacked{"App/Spec/Run/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use warnings;
   package App::Spec::Run::Validator;
   
-  our $VERSION = '0.008'; # VERSION;
+  our $VERSION = '0.009'; # VERSION;
   
   use List::Util qw/ any /;
   use List::MoreUtils qw/ uniq /;
@@ -4691,7 +4710,7 @@ $fatpacked{"App/Spec/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Subcommand;
   
-  our $VERSION = '0.008'; # VERSION
+  our $VERSION = '0.009'; # VERSION
   
   use App::Spec::Option;
   use App::Spec::Parameter;
@@ -13423,7 +13442,7 @@ $fatpacked{"YAML/PP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'YAML_PP
   use warnings;
   package YAML::PP;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Schema;
   use YAML::PP::Schema::JSON;
@@ -13651,7 +13670,7 @@ $fatpacked{"YAML/PP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'YAML_PP
   file or string.
   
   The YAML::PP frontend will currently load all documents, and return only
-  the first if called with scalar context.
+  the last if called with scalar context.
   
   The YAML backend is implemented in a modular way that allows to add
   custom handling of YAML tags, perl objects and data types. The inner API
@@ -13971,7 +13990,10 @@ $fatpacked{"YAML/PP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'YAML_PP
       my $yaml = $ypp->dump_string($doc1, $doc2);
       my $yaml = $ypp->dump_string(@docs);
   
-  Output will be UTF-8 decoded
+  Input data should be UTF-8 decoded. If not, it will be upgraded with
+  C<utf8::upgrade>.
+  
+  Output will be UTF-8 decoded.
   
   =item dump_file
   
@@ -13979,7 +14001,10 @@ $fatpacked{"YAML/PP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'YAML_PP
       $ypp->dump_file("file.yaml", $doc1, $doc2);
       $ypp->dump_file("file.yaml", @docs);
   
-  File will be written UTF-8 encoded
+  Input data should be UTF-8 decoded. If not, it will be upgraded with
+  C<utf8::upgrade>.
+  
+  File will be written UTF-8 encoded.
   
   =item dump
   
@@ -14257,7 +14282,7 @@ $fatpacked{"YAML/PP/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Common;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'Exporter';
   
@@ -14499,7 +14524,7 @@ $fatpacked{"YAML/PP/Constructor.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Constructor;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP;
   use Scalar::Util qw/ reftype /;
@@ -14817,7 +14842,7 @@ $fatpacked{"YAML/PP/Dumper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Dumper;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use Scalar::Util qw/ blessed refaddr reftype /;
   use YAML::PP;
@@ -15030,7 +15055,7 @@ $fatpacked{"YAML/PP/Emitter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package YAML::PP::Emitter;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Common qw/
       YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
@@ -15369,6 +15394,9 @@ $fatpacked{"YAML/PP/Emitter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
       my $last = $stack->[-1];
       my $indent = $last->{indent};
       my $value = $info->{value};
+      unless (utf8::is_utf8($value)) {
+          utf8::upgrade($value);
+      }
   
       my $props = '';
       my $anchor = $info->{anchor};
@@ -15432,6 +15460,10 @@ $fatpacked{"YAML/PP/Emitter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
               $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
           }
           elsif ($value =~ m/[: \t]\z/) {
+              $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+          }
+          elsif ($value =~ m/[^\x20-\x3A\x3B-\x7E\x85\xA0-\x{D7FF}\x{E000}-\x{FEFE}\x{FF00}-\x{FFFD}\x{10000}-\x{10FFFF}]/) {
+              # TODO exclude ,[]{} in flow collections
               $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
           }
           else {
@@ -15800,7 +15832,7 @@ $fatpacked{"YAML/PP/Exception.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package YAML::PP::Exception;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use overload '""' => \&to_string;
   
@@ -15882,7 +15914,7 @@ $fatpacked{"YAML/PP/Grammar.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package YAML::PP::Grammar;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'Exporter';
   
@@ -17599,7 +17631,7 @@ $fatpacked{"YAML/PP/Highlight.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package YAML::PP::Highlight;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   our @EXPORT_OK = qw/ Dump /;
   
@@ -17814,7 +17846,7 @@ $fatpacked{"YAML/PP/Lexer.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'Y
   use warnings;
   package YAML::PP::Lexer;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
   use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -17876,11 +17908,11 @@ $fatpacked{"YAML/PP/Lexer.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'Y
   my $RE_ANCHOR_CAR = '[\x21-\x2B\x2D-\x5A\x5C\x5E-\x7A\x7C\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
   
   my $RE_PLAIN_START = '[\x21\x22\x24-\x39\x3B-\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
-  my $RE_PLAIN_END = '[\x21-\x39\x3B-\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
+  my $RE_PLAIN_END = '[\x21-\x39\x3B-\x7E\x85\xA0-\x{D7FF}\x{E000}-\x{FEFE}\x{FF00}-\x{FFFD}\x{10000}-\x{10FFFF}]';
   my $RE_PLAIN_FIRST = '[\x24\x28-\x29\x2B\x2E-\x39\x3B-\x3D\x41-\x5A\x5C\x5E-\x5F\x61-\x7A\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
   
   my $RE_PLAIN_START_FLOW = '[\x21\x22\x24-\x2B\x2D-\x39\x3B-\x5A\x5C\x5E-\x7A\x7C\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
-  my $RE_PLAIN_END_FLOW = '[\x21-\x2B\x2D-\x39\x3B-\x5A\x5C\x5E-\x7A\x7C\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
+  my $RE_PLAIN_END_FLOW = '[\x21-\x2B\x2D-\x39\x3B-\x5A\x5C\x5E-\x7A\x7C\x7E\x85\xA0-\x{D7FF}\x{E000}-\x{FEFE}\x{FF00}-\x{FFFD}\x{10000}-\x{10FFFF}]';
   my $RE_PLAIN_FIRST_FLOW = '[\x24\x28-\x29\x2B\x2E-\x39\x3B-\x3D\x41-\x5A\x5C\x5E-\x5F\x61-\x7A\x7C\x7E\xA0-\xFF\x{100}-\x{10FFFF}]';
   # c-indicators
   #! 21
@@ -18722,7 +18754,7 @@ $fatpacked{"YAML/PP/Loader.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Loader;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Parser;
   use YAML::PP::Constructor;
@@ -18776,7 +18808,7 @@ $fatpacked{"YAML/PP/Loader.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
       $parser->parse();
   
       my $docs = $constructor->docs;
-      return wantarray ? @$docs : $docs->[0];
+      return wantarray ? @$docs : $docs->[-1];
   }
   
   
@@ -18789,7 +18821,7 @@ $fatpacked{"YAML/PP/Parser.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Parser;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
   use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -20132,7 +20164,7 @@ $fatpacked{"YAML/PP/Perl.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'YA
   use warnings;
   package YAML::PP::Perl;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'Exporter';
   use base 'YAML::PP';
@@ -20219,7 +20251,7 @@ $fatpacked{"YAML/PP/Reader.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Reader;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   sub input { return $_[0]->{input} }
   sub set_input { $_[0]->{input} = $_[1] }
@@ -20300,7 +20332,7 @@ $fatpacked{"YAML/PP/Render.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Render;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
   
@@ -20447,7 +20479,7 @@ $fatpacked{"YAML/PP/Representer.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Representer;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use Scalar::Util qw/ reftype blessed refaddr /;
   
@@ -20607,7 +20639,7 @@ $fatpacked{"YAML/PP/Schema.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use B;
   use Module::Load qw//;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
   
@@ -21003,7 +21035,7 @@ $fatpacked{"YAML/PP/Schema/Binary.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package YAML::PP::Schema::Binary;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use MIME::Base64 qw/ decode_base64 encode_base64 /;
   use YAML::PP::Common qw/ YAML_ANY_SCALAR_STYLE /;
@@ -21099,7 +21131,7 @@ $fatpacked{"YAML/PP/Schema/Core.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Schema::Core;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Schema::JSON qw/
       represent_int represent_float represent_literal represent_bool
@@ -21243,7 +21275,7 @@ $fatpacked{"YAML/PP/Schema/Failsafe.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use warnings;
   package YAML::PP::Schema::Failsafe;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Common qw/ YAML_QUOTED_SCALAR_STYLE /;
   
@@ -21294,7 +21326,7 @@ $fatpacked{"YAML/PP/Schema/JSON.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Schema::JSON;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'Exporter';
   our @EXPORT_OK = qw/
@@ -21487,7 +21519,7 @@ $fatpacked{"YAML/PP/Schema/Merge.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use warnings;
   package YAML::PP::Schema::Merge;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Type::MergeKey;
   
@@ -21591,7 +21623,7 @@ $fatpacked{"YAML/PP/Schema/Perl.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Schema::Perl;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'YAML::PP::Schema';
   
@@ -21602,10 +21634,10 @@ $fatpacked{"YAML/PP/Schema/Perl.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   # workaround to avoid growing regexes when repeatedly loading and dumping
   # e.g. (?^:(?^:regex))
   {
-      my $test_qr = qr{TEST_STRINGYFY_REGEX};
-      my $test_qr_string = "$test_qr";
-      $qr_prefix = $test_qr_string;
-      $qr_prefix =~ s/TEST_STRINGYFY_REGEX.*//;
+      $qr_prefix = qr{\(\?-xism\:};
+      if ($] >= 5.014) {
+          $qr_prefix = qr{\(\?\^(?:[uadl])?\:};
+      }
   }
   
   sub register {
@@ -21902,7 +21934,7 @@ $fatpacked{"YAML/PP/Schema/Perl.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   sub construct_regex {
       my ($self, $regex) = @_;
-      if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
+      if ($regex =~ m/^$qr_prefix(.*)\)\z/s) {
           $regex = $1;
       }
       my $qr = qr{$regex};
@@ -21944,7 +21976,7 @@ $fatpacked{"YAML/PP/Schema/Perl.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   sub represent_regex {
       my ($self, $regex) = @_;
       $regex = "$regex";
-      if ($regex =~ m/^\Q$qr_prefix\E(.*)\)\z/s) {
+      if ($regex =~ m/^$qr_prefix(.*)\)\z/s) {
           $regex = $1;
       }
       return $regex;
@@ -22331,7 +22363,7 @@ $fatpacked{"YAML/PP/Schema/Tie/IxHash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__
   use warnings;
   package YAML::PP::Schema::Tie::IxHash;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use base 'YAML::PP::Schema';
   
@@ -22488,7 +22520,7 @@ $fatpacked{"YAML/PP/Schema/YAML1_1.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use warnings;
   package YAML::PP::Schema::YAML1_1;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use YAML::PP::Schema::JSON qw/
       represent_int represent_float represent_literal represent_bool
@@ -22731,7 +22763,7 @@ $fatpacked{"YAML/PP/Type/MergeKey.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package YAML::PP::Type::MergeKey;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   sub new {
       my ($class) = @_;
@@ -22775,7 +22807,7 @@ $fatpacked{"YAML/PP/Writer.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use warnings;
   package YAML::PP::Writer;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   sub output { return $_[0]->{output} }
   sub set_output { $_[0]->{output} = $_[1] }
@@ -22866,7 +22898,7 @@ $fatpacked{"YAML/PP/Writer/File.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package YAML::PP::Writer::File;
   
-  our $VERSION = '0.015'; # VERSION
+  our $VERSION = '0.016'; # VERSION
   
   use Scalar::Util qw/ openhandle /;
   
