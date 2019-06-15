@@ -382,7 +382,7 @@ $fatpacked{"App/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SP
   package App::Spec;
   use 5.010;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use App::Spec::Subcommand;
   use App::Spec::Option;
@@ -807,7 +807,7 @@ $fatpacked{"App/Spec/Argument.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package App::Spec::Argument;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   
@@ -1075,7 +1075,7 @@ $fatpacked{"App/Spec/Completion.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Completion;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   
@@ -1112,7 +1112,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use warnings;
   package App::Spec::Completion::Bash;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -1298,7 +1298,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
               options => $options,
               level => $level,
               functions => $args{functions},
-              previous => $args{previous},
+              previous => $previous,
           );
       }
       if (@$parameters) {
@@ -1460,7 +1460,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   sub dynamic_completion {
       my ($self, %args) = @_;
       my $functions = $args{functions};
-      my $previous = $args{previous};
+      my $previous = $args{previous} || [];
       my $p = $args{option};
       my $level = $args{level};
       my $indent = '        ' x $level;
@@ -1810,7 +1810,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use warnings;
   package App::Spec::Completion::Zsh;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -2286,7 +2286,7 @@ $fatpacked{"App/Spec/Option.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package App::Spec::Option;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2342,7 +2342,7 @@ $fatpacked{"App/Spec/Parameter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use warnings;
   package App::Spec::Parameter;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2420,7 +2420,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   package App::Spec::Plugin::Format;
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use YAML::PP;
   use Ref::Util qw/ is_arrayref /;
@@ -2542,7 +2542,7 @@ $fatpacked{"App/Spec/Plugin/Help.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Help;
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   with 'App::Spec::Role::Plugin::Subcommand';
@@ -2718,7 +2718,7 @@ $fatpacked{"App/Spec/Plugin/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Meta;
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use List::Util qw/ any /;
   
@@ -2839,7 +2839,7 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Pod;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Text::Table;
   
@@ -3125,7 +3125,7 @@ $fatpacked{"App/Spec/Role/Command.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Role::Command;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use YAML::PP;
   use List::Util qw/ any /;
@@ -3362,7 +3362,7 @@ $fatpacked{"App/Spec/Role/Plugin.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use warnings;
   package App::Spec::Role::Plugin;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo::Role;
   
@@ -3405,7 +3405,7 @@ $fatpacked{"App/Spec/Role/Plugin/GlobalOptions.pm"} = '#line '.(1+__LINE__).' "'
   use warnings;
   package App::Spec::Role::Plugin::GlobalOptions;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo::Role;
   
@@ -3454,7 +3454,7 @@ $fatpacked{"App/Spec/Role/Plugin/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__
   use warnings;
   package App::Spec::Role::Plugin::Subcommand;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo::Role;
   
@@ -3494,7 +3494,7 @@ $fatpacked{"App/Spec/Run.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Run;
   use 5.010;
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use App::Spec::Run::Validator;
   use App::Spec::Run::Response;
@@ -4178,7 +4178,7 @@ $fatpacked{"App/Spec/Run/Cmd.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   package App::Spec::Run::Cmd;
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use App::Spec::Run;
   use Moo;
@@ -4202,7 +4202,7 @@ $fatpacked{"App/Spec/Run/Output.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Run::Output;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use Moo;
   
@@ -4247,7 +4247,7 @@ $fatpacked{"App/Spec/Run/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Run::Response;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use App::Spec::Run::Output;
   use Scalar::Util qw/ blessed /;
@@ -4433,7 +4433,7 @@ $fatpacked{"App/Spec/Run/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use warnings;
   package App::Spec::Run::Validator;
   
-  our $VERSION = '0.009'; # VERSION;
+  our $VERSION = '0.010'; # VERSION;
   
   use List::Util qw/ any /;
   use List::MoreUtils qw/ uniq /;
@@ -4710,7 +4710,7 @@ $fatpacked{"App/Spec/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Subcommand;
   
-  our $VERSION = '0.009'; # VERSION
+  our $VERSION = '0.010'; # VERSION
   
   use App::Spec::Option;
   use App::Spec::Parameter;
