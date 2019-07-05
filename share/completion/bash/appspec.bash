@@ -1,6 +1,6 @@
 #!bash
 
-# Generated with perl module App::Spec v0.009
+# Generated with perl module App::Spec v0.012
 
 _appspec() {
 
