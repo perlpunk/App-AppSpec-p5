@@ -237,7 +237,7 @@ $fatpacked{"App/AppSpec/Schema/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FIL
   our $VERSION = '0.000'; # VERSION
   
   use App::Spec;
-  use File::Share qw/ dist_file /;
+  use App::Spec::Schema qw/ $SCHEMA /;
   use YAML::PP;
   use Moo;
   
@@ -252,11 +252,8 @@ $fatpacked{"App/AppSpec/Schema/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FIL
       my ($self, $spec) = @_;
       eval { require JSON::Validator }
           or die "JSON::Validator is needed for validating a spec file";
-      my $schema_file = dist_file("App-Spec", "schema.yaml");
       my $json_validator = JSON::Validator->new;
-      my $yp = YAML::PP->new( boolean => 'JSON::PP', schema => [qw/ JSON /] );
-      my $schema = $yp->load_file($schema_file);
-      $json_validator->schema($schema);
+      $json_validator->schema($SCHEMA);
       my @errors = $json_validator->validate($spec);
       return @errors;
   }
@@ -382,7 +379,7 @@ $fatpacked{"App/Spec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SP
   package App::Spec;
   use 5.010;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use App::Spec::Subcommand;
   use App::Spec::Option;
@@ -807,7 +804,7 @@ $fatpacked{"App/Spec/Argument.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use warnings;
   package App::Spec::Argument;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   
@@ -1075,7 +1072,7 @@ $fatpacked{"App/Spec/Completion.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Completion;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   
@@ -1112,7 +1109,7 @@ $fatpacked{"App/Spec/Completion/Bash.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use warnings;
   package App::Spec::Completion::Bash;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -1810,7 +1807,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use warnings;
   package App::Spec::Completion::Zsh;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   extends 'App::Spec::Completion';
@@ -2126,7 +2123,7 @@ $fatpacked{"App/Spec/Completion/Zsh.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   $function_name() \{
       local __dynamic_completion
       local CURRENT_WORD="\$words\[CURRENT\]"
-      IFS=\$'\\n' set -A __dynamic_completion \$( $string )
+      IFS=\$'\\n' __dynamic_completion=( \$( $string ) )
       compadd -X "$shell_name:" \$__dynamic_completion
   \}
   EOM
@@ -2286,7 +2283,7 @@ $fatpacked{"App/Spec/Option.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use warnings;
   package App::Spec::Option;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2342,7 +2339,7 @@ $fatpacked{"App/Spec/Parameter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use warnings;
   package App::Spec::Parameter;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use base 'App::Spec::Argument';
   use Moo;
@@ -2420,7 +2417,7 @@ $fatpacked{"App/Spec/Plugin/Format.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   package App::Spec::Plugin::Format;
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use YAML::PP;
   use Ref::Util qw/ is_arrayref /;
@@ -2542,7 +2539,7 @@ $fatpacked{"App/Spec/Plugin/Help.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Help;
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   with 'App::Spec::Role::Plugin::Subcommand';
@@ -2718,7 +2715,7 @@ $fatpacked{"App/Spec/Plugin/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   package App::Spec::Plugin::Meta;
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use List::Util qw/ any /;
   
@@ -2839,9 +2836,7 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Pod;
   
-  our $VERSION = '0.010'; # VERSION
-  
-  use Text::Table;
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   
@@ -2990,7 +2985,6 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
       my ($self, %args) = @_;
       my $params = $args{parameters};
       my @rows;
-      my $tb = Text::Table->new;
       for my $param (@$params) {
           my $required = $param->required ? '*' : '';
           my $summary = $param->summary;
@@ -3004,15 +2998,37 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
           my $flags = $self->spec->_param_flags_string($param);
           push @rows, ["    " . $param->name, " " . $required, $multi, $summary . $flags];
       }
-      $tb->load(@rows);
-      return "$tb";
+      my $test = $self->simple_table(\@rows);
+      return $test;
+  }
+  
+  sub simple_table {
+      my ($self, $rows) = @_;
+      my @widths;
+  
+      for my $row (@$rows) {
+          for my $i (0 .. $#$row) {
+              my $col = $row->[ $i ];
+              $widths[ $i ] ||= 0;
+              if ( $widths[ $i ] < length $col) {
+                  $widths[ $i ] = length $col;
+              }
+          }
+      }
+      my $format = join ' ', map { "%-" . ($_ || 0) . "s" } @widths;
+      my @lines;
+      for my $row (@$rows) {
+          my $string = sprintf "$format\n", map { $_ // '' } @$row;
+          push @lines, $string;
+      }
+      return join '', @lines;
+  
   }
   
   sub options2pod {
       my ($self, %args) = @_;
       my $options = $args{options};
       my @rows;
-      my $tb = Text::Table->new;
       for my $opt (@$options) {
           my $name = $opt->name;
           my $aliases = $opt->aliases;
@@ -3031,8 +3047,8 @@ $fatpacked{"App/Spec/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
           my $flags = $self->spec->_param_flags_string($opt);
           push @rows, ["    @names", " " . $required, $multi, $summary . $flags];
       }
-      $tb->load(@rows);
-      return "$tb";
+      my $test = $self->simple_table(\@rows);
+      return $test;
   }
   
   sub markup {
@@ -3125,7 +3141,7 @@ $fatpacked{"App/Spec/Role/Command.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Role::Command;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use YAML::PP;
   use List::Util qw/ any /;
@@ -3192,8 +3208,19 @@ $fatpacked{"App/Spec/Role/Command.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
       my $spec = $class->load_data($file);
   
-      my @plugins = $class->default_plugins;
-      push @plugins, @{ $spec->{plugins} || [] };
+      my %disable;
+      my @plugins;
+  
+      my $spec_plugins = $spec->{plugins} || [];
+      for my $plugin (@$spec_plugins) {
+          if ($plugin =~ m/^-(.*)/) {
+              $disable{ $1 } = 1;
+          }
+      }
+      my @default_plugins = grep { not $disable{ $_ } } $class->default_plugins;
+  
+      push @plugins, @default_plugins;
+      push @plugins, grep{ not m/^-/ } @$spec_plugins;
       for my $plugin (@plugins) {
           unless ($plugin =~ s/^=//) {
               $plugin = "App::Spec::Plugin::$plugin";
@@ -3362,7 +3389,7 @@ $fatpacked{"App/Spec/Role/Plugin.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use warnings;
   package App::Spec::Role::Plugin;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo::Role;
   
@@ -3405,7 +3432,7 @@ $fatpacked{"App/Spec/Role/Plugin/GlobalOptions.pm"} = '#line '.(1+__LINE__).' "'
   use warnings;
   package App::Spec::Role::Plugin::GlobalOptions;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo::Role;
   
@@ -3454,7 +3481,7 @@ $fatpacked{"App/Spec/Role/Plugin/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__
   use warnings;
   package App::Spec::Role::Plugin::Subcommand;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo::Role;
   
@@ -3494,7 +3521,7 @@ $fatpacked{"App/Spec/Run.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'AP
   use warnings;
   package App::Spec::Run;
   use 5.010;
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use App::Spec::Run::Validator;
   use App::Spec::Run::Response;
@@ -4178,7 +4205,7 @@ $fatpacked{"App/Spec/Run/Cmd.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   package App::Spec::Run::Cmd;
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use App::Spec::Run;
   use Moo;
@@ -4202,7 +4229,7 @@ $fatpacked{"App/Spec/Run/Output.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use warnings;
   package App::Spec::Run::Output;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use Moo;
   
@@ -4247,7 +4274,7 @@ $fatpacked{"App/Spec/Run/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use warnings;
   package App::Spec::Run::Response;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use App::Spec::Run::Output;
   use Scalar::Util qw/ blessed /;
@@ -4433,7 +4460,7 @@ $fatpacked{"App/Spec/Run/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use warnings;
   package App::Spec::Run::Validator;
   
-  our $VERSION = '0.010'; # VERSION;
+  our $VERSION = '0.012'; # VERSION;
   
   use List::Util qw/ any /;
   use List::MoreUtils qw/ uniq /;
@@ -4704,13 +4731,247 @@ $fatpacked{"App/Spec/Run/Validator.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   =cut
 APP_SPEC_RUN_VALIDATOR
 
+$fatpacked{"App/Spec/Schema.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SPEC_SCHEMA';
+  use strict;
+  use warnings;
+  package App::Spec::Schema;
+  
+  our $VERSION = '0.012'; # VERSION
+  
+  use base 'Exporter';
+  our @EXPORT_OK = qw/ $SCHEMA /;
+  
+  our $SCHEMA;
+  
+  # START INLINE
+  $SCHEMA = {
+    'additionalProperties' => '',
+    'definitions' => {
+      'bool' => {
+        'anyOf' => [
+          {
+            'type' => 'boolean'
+          },
+          {
+            'type' => 'integer'
+          },
+          {
+            'maxLength' => 0,
+            'type' => 'string'
+          }
+        ]
+      },
+      'command' => {
+        'additionalProperties' => '',
+        'properties' => {
+          'description' => {
+            'type' => 'string'
+          },
+          'op' => {
+            'type' => 'string'
+          },
+          'options' => {
+            '$ref' => '#/definitions/options'
+          },
+          'parameters' => {
+            '$ref' => '#/definitions/options'
+          },
+          'subcommands' => {
+            'additionalProperties' => '',
+            'patternProperties' => {
+              '^[a-zA-Z0-9_]+$' => {
+                '$ref' => '#/definitions/command'
+              }
+            },
+            'type' => 'object'
+          },
+          'summary' => {
+            'type' => 'string'
+          }
+        },
+        'type' => 'object'
+      },
+      'option' => {
+        'additionalProperties' => '',
+        'anyOf' => [
+          {
+            'required' => [
+              'name'
+            ]
+          },
+          {
+            'required' => [
+              'spec'
+            ]
+          }
+        ],
+        'properties' => {
+          'aliases' => {
+            'items' => {
+              'type' => 'string'
+            },
+            'type' => 'array'
+          },
+          'completion' => {
+            'oneOf' => [
+              {
+                'type' => 'object'
+              },
+              {
+                '$ref' => '#/definitions/bool'
+              }
+            ]
+          },
+          'default' => {
+            'type' => 'string'
+          },
+          'description' => {
+            'type' => 'string'
+          },
+          'enum' => {
+            'items' => {
+              'type' => 'string'
+            },
+            'type' => 'array'
+          },
+          'mapping' => {
+            '$ref' => '#/definitions/bool'
+          },
+          'multiple' => {
+            '$ref' => '#/definitions/bool'
+          },
+          'name' => {
+            'type' => 'string'
+          },
+          'required' => {
+            '$ref' => '#/definitions/bool'
+          },
+          'spec' => {
+            'type' => 'string'
+          },
+          'summary' => {
+            'type' => 'string'
+          },
+          'type' => {
+            'oneOf' => [
+              {
+                '$ref' => '#/definitions/optionTypeSimple'
+              }
+            ]
+          },
+          'unique' => {
+            '$ref' => '#/definitions/bool'
+          },
+          'values' => {
+            'additionalProperties' => '',
+            'properties' => {
+              'enum' => {
+                'items' => {
+                  'type' => 'string'
+                },
+                'type' => 'array'
+              },
+              'mapping' => {
+                'type' => 'object'
+              },
+              'op' => {
+                'type' => 'string'
+              }
+            },
+            'type' => 'object'
+          }
+        },
+        'type' => [
+          'object',
+          'string'
+        ]
+      },
+      'optionTypeSimple' => {
+        'enum' => [
+          'flag',
+          'string',
+          'integer',
+          'file'
+        ]
+      },
+      'options' => {
+        'items' => {
+          '$ref' => '#/definitions/option'
+        },
+        'type' => 'array'
+      }
+    },
+    'properties' => {
+      'abstract' => {
+        'type' => 'string'
+      },
+      'appspec' => {
+        'additionalProperties' => '',
+        'properties' => {
+          'version' => {
+            'type' => 'number'
+          }
+        },
+        'required' => [
+          'version'
+        ],
+        'type' => 'object'
+      },
+      'class' => {
+        'type' => 'string'
+      },
+      'description' => {
+        'type' => 'string'
+      },
+      'markup' => {
+        'type' => 'string'
+      },
+      'name' => {
+        'type' => 'string'
+      },
+      'options' => {
+        '$ref' => '#/definitions/options'
+      },
+      'parameters' => {
+        '$ref' => '#/definitions/options'
+      },
+      'plugins' => {
+        'items' => {
+          'type' => 'string'
+        },
+        'type' => 'array'
+      },
+      'subcommands' => {
+        'additionalProperties' => '',
+        'patternProperties' => {
+          '^[a-zA-Z0-9_]+$' => {
+            '$ref' => '#/definitions/command'
+          }
+        },
+        'type' => 'object'
+      },
+      'title' => {
+        'type' => 'string'
+      }
+    },
+    'required' => [
+      'name',
+      'appspec'
+    ],
+    'type' => 'object'
+  };
+  # END INLINE
+  
+  1;
+APP_SPEC_SCHEMA
+
 $fatpacked{"App/Spec/Subcommand.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_SPEC_SUBCOMMAND';
   # ABSTRACT: Represents an App::Spec subcommand
   use strict;
   use warnings;
   package App::Spec::Subcommand;
   
-  our $VERSION = '0.010'; # VERSION
+  our $VERSION = '0.012'; # VERSION
   
   use App::Spec::Option;
   use App::Spec::Parameter;
