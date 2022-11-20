@@ -1,0 +1,71 @@
+name: Create GHCR Docker Container(s)
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+     - 'v*' # Push events to matching v*, i.e v1.0, v1.0-rc, v20.15.10 etc
+     - 'latest'
+
+jobs:
+  # Build contianer
+  build_container:
+    name: Build Container
+    runs-on: ubuntu-latest
+    steps:
+      # Standard checkout step
+      - name: Checkout code
+        id: git_checkout
+        uses: actions/checkout@v3
+      # Use qemu to perform multiplatform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # Use docker buildx to build multi-platform containers
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          use: true
+          install: true
+          config-inline: |
+            [worker.oci]
+              max-parallelism = 2
+      # Log in to GitHub Container registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Downcase repo
+      # https://github.com/orgs/community/discussions/25768
+      - name: Repo name to lowercase
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> "${GITHUB_ENV}"
+      - name: Drop v from tag
+        run: |
+          VERSION_NAME="${{github.ref_name}}"
+          echo "VERSION_NAME=${VERSION_NAME:1}" >> "${GITHUB_ENV}"
+      # Get tags
+      # Adds latest if tags not present
+      - name: Get tags
+        shell: bash
+        run: |
+          TAGS="$( \
+            if [[ "${{github.ref_name}}" == *-rc ]]; then
+              echo "ghcr.io/${{ env.REPO }}:${{github.ref_name}}"
+            else
+              echo "ghcr.io/${{ env.REPO }}:${{github.ref_name}},${{ env.REPO }}:latest"
+            fi
+          )"
+          echo "TAGS=${TAGS}" >> "${GITHUB_ENV}"
+      # Build and push docker images
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.TAGS }}
+          build-args: |
+            APP_APPSPEC_REPO=https://github.com/${{ env.REPO }}
+            APP_APPSPEC_VERSION=${{ env.VERSION_NAME }}
