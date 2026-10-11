@@ -38,8 +38,9 @@ shell script for tab completion.
       'op' => 'cmd_completion',
       'options' => [
         'name=s --name of the program (optional, override the value from the spec)',
-        'zsh --for zsh',
-        'bash --for bash'
+        'zsh  --for zsh',
+        'bash --for bash',
+        'fish --for fish (>= 4.0)'
       ],
       'parameters' => [
         '+spec_file= +file --Path to the spec file (use \'-\' for standard input)'
@@ -63,7 +64,7 @@ Example:
         'with-subcommands|s --Create an app with subcommands'
       ],
       'parameters' => [
-        'path=s --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
+        'path= +dirname --Path to the distribution directory (default is \'Dist-Name\' in current directory)'
       ],
       'summary' => 'Create new app'
     },

@@ -27,7 +27,7 @@ sub cmd_completion {
     my $parameters = $run->parameters;
     my $name = $options->{name};
 
-    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : '';
+    my $shell = $options->{zsh} ? "zsh" : $options->{bash} ? "bash" : $options->{fish} ? "fish": '';
     die "Specify which shell" unless $shell;
 
     my $spec = $self->_read_spec($run);
