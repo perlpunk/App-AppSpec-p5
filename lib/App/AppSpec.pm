@@ -6,6 +6,7 @@ use utf8;
 package App::AppSpec;
 use Term::ANSIColor;
 use YAML::PP;
+use Encode qw/ encode_utf8 /;
 use File::Basename qw/ dirname /;
 
 our $VERSION = '0.000'; # VERSION
@@ -37,6 +38,9 @@ sub cmd_completion {
     my $completion = $spec->generate_completion(
         shell => $shell,
     );
+    if ($completion =~ m/[^\x00-\x7F]/) {
+        $completion = encode_utf8 $completion;
+    }
     say $completion;
 }
 
@@ -52,6 +56,9 @@ sub generate_pod {
     );
     my $pod = $generator->generate;
 
+    if ($pod =~ m/[^\x00-\x7F]/) {
+        $pod = encode_utf8 $pod;
+    }
     say $pod;
 }
 
